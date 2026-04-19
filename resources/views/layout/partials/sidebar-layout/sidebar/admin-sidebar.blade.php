@@ -26,6 +26,42 @@
                     <span class="menu-title">{{ __('Landing Page') }}</span>
                 </a>
             </div>
+            <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.shop-page.*') ? 'active' : '' }}"
+                    href="{{ route('admin.shop-page.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('Shop Page') }}</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.perfume-page.*') ? 'active' : '' }}"
+                    href="{{ route('admin.perfume-page.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('Perfume Page') }}</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.about-page.*') ? 'active' : '' }}"
+                    href="{{ route('admin.about-page.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('About Page') }}</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}"
+                    href="{{ route('admin.reviews.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('Reviews') }}</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>

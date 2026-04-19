@@ -4,13 +4,13 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section class="hero-section-centered" style="background-image: url('{{ asset('frontend/images/perfume2.jpg') }}');">
+    <section class="hero-section-centered" style="background-image: url('{{ asset($shopPage?->hero_image ?? 'frontend/images/perfume2.jpg') }}');">
         <div class="hero-overlay-light"></div>
         
         <div class="hero-content-centered">
             <div class="hero-text-centered">
-                <h1>Our Collection</h1>
-                <p>Browse our exclusive range of premium fragrances curated for every occasion and personality.</p>
+                <h1>{{ $shopPage?->hero_heading ?? 'Our Collection' }}</h1>
+                <p>{{ $shopPage?->hero_subheading ?? 'Browse our exclusive range of premium fragrances curated for every occasion and personality.' }}</p>
             </div>
         </div>
     </section>
@@ -20,222 +20,70 @@
         <div class="container">
             <h2 class="section-title">All Fragrances</h2>
             
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?w=300&h=400&fit=crop" alt="Emeraude Noire" class="img-fluid">
-                            <span class="sale-badge">-20%</span>
+            <!-- Category Tabs -->
+            <div class="shop-tabs-container">
+                <ul class="nav nav-tabs shop-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" onclick="filterCategory('all')">All</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="men-tab" data-bs-toggle="tab" data-bs-target="#men" type="button" role="tab" onclick="filterCategory('men')">For Men</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="women-tab" data-bs-toggle="tab" data-bs-target="#women" type="button" role="tab" onclick="filterCategory('women')">For Women</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="unisex-tab" data-bs-toggle="tab" data-bs-target="#unisex" type="button" role="tab" onclick="filterCategory('unisex')">Unisex</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="arabic-tab" data-bs-toggle="tab" data-bs-target="#arabic" type="button" role="tab" onclick="filterCategory('arabic')">Arabic Perfumes</button>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="row" id="shopProductsGrid">
+                @forelse($products as $index => $product)
+                    <div class="col-lg-4 col-md-6 mb-4 shop-product-item" data-index="{{ $index }}" data-category="all,{{ $product->category }}" style="display: {{ $index < 3 ? 'block' : 'none' }};">
+                        <div class="product-card">
+                            <div class="product-image-shop">
+                                <img src="{{ asset($product->image ?? 'frontend/images/perfume2.jpg') }}" alt="{{ $product->name }}" class="img-fluid">
+                                @if($product->discount_percentage && $product->discount_percentage > 0)
+                                    <span class="sale-badge">-{{ $product->discount_percentage }}%</span>
+                                @endif
+                            </div>
+                            <h5 class="mt-3">{{ $product->name }}</h5>
+                            <p class="text-muted">{{ $product->description ?? 'Premium quality perfume' }}</p>
+                            <div class="rating mb-2">
+                                @for($i = 0; $i < floor($product->rating); $i++)
+                                    <i class="fas fa-star" style="color: #000000;"></i>
+                                @endfor
+                                @if($product->rating % 1 != 0)
+                                    <i class="fas fa-star-half" style="color: #000000;"></i>
+                                @endif
+                                <span class="ms-2">({{ $product->reviews_count }} reviews)</span>
+                            </div>
+                            <div class="price-section">
+                                <p class="price">Rs {{ number_format($product->price, 0) }}</p>
+                                @if($product->original_price)
+                                    <p class="original-price"><s>Rs {{ number_format($product->original_price, 0) }}</s></p>
+                                @endif
+                            </div>
+                            <button class="btn-primary-custom w-100">Add to Cart</button>
                         </div>
-                        <h5 class="mt-3">Emeraude Noire</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star-half" style="color: #000000;"></i>
-                            <span class="ms-2">(185 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 51,530</p>
-                            <p class="original-price"><s>Rs 64,615</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
                     </div>
-                </div>
+                @empty
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">No products available</p>
+                    </div>
+                @endforelse
+            </div>
+            </div>
 
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?w=300&h=400&fit=crop" alt="Rose Dorée" class="img-fluid">
-                            <span class="sale-badge">-15%</span>
-                        </div>
-                        <h5 class="mt-3">Rose Dorée</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star-half" style="color: #000000;"></i>
-                            <span class="ms-2">(210 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 58,695</p>
-                            <p class="original-price"><s>Rs 68,815</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3962287/pexels-photo-3962287.jpeg?w=300&h=400&fit=crop" alt="Ombre Intense" class="img-fluid">
-                            <span class="sale-badge">-25%</span>
-                        </div>
-                        <h5 class="mt-3">Ombre Intense</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star-half" style="color: #000000;"></i>
-                            <span class="ms-2">(165 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 46,185</p>
-                            <p class="original-price"><s>Rs 61,580</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3962288/pexels-photo-3962288.jpeg?w=300&h=400&fit=crop" alt="Ambre Royal" class="img-fluid">
-                            <span class="sale-badge">-18%</span>
-                        </div>
-                        <h5 class="mt-3">Ambre Royal</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star-half" style="color: #000000;"></i>
-                            <span class="ms-2">(195 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 54,525</p>
-                            <p class="original-price"><s>Rs 66,430</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?w=300&h=400&fit=crop" alt="Fleur de Rose" class="img-fluid">
-                            <span class="sale-badge">-22%</span>
-                        </div>
-                        <h5 class="mt-3">Fleur de Rose</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <span class="ms-2">(220 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 61,475</p>
-                            <p class="original-price"><s>Rs 78,815</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?w=300&h=400&fit=crop" alt="Perle Blanche" class="img-fluid">
-                            <span class="sale-badge">-12%</span>
-                        </div>
-                        <h5 class="mt-3">Perle Blanche</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star-half" style="color: #000000;"></i>
-                            <span class="ms-2">(240 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 67,075</p>
-                            <p class="original-price"><s>Rs 76,045</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3962287/pexels-photo-3962287.jpeg?w=300&h=400&fit=crop" alt="Midnight Elegance" class="img-fluid">
-                            <span class="sale-badge">-20%</span>
-                        </div>
-                        <h5 class="mt-3">Midnight Elegance</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <span class="ms-2">(175 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 52,847</p>
-                            <p class="original-price"><s>Rs 66,060</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3962288/pexels-photo-3962288.jpeg?w=300&h=400&fit=crop" alt="Golden Hour" class="img-fluid">
-                            <span class="sale-badge">-18%</span>
-                        </div>
-                        <h5 class="mt-3">Golden Hour</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star-half" style="color: #000000;"></i>
-                            <span class="ms-2">(198 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 50,097</p>
-                            <p class="original-price"><s>Rs 61,095</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="product-card">
-                        <div class="product-image-shop">
-                            <img src="https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?w=300&h=400&fit=crop" alt="Ocean Breeze" class="img-fluid">
-                            <span class="sale-badge">-16%</span>
-                        </div>
-                        <h5 class="mt-3">Ocean Breeze</h5>
-                        <p class="text-muted">Premium quality perfume</p>
-                        <div class="rating mb-2">
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <i class="fas fa-star" style="color: #000000;"></i>
-                            <span class="ms-2">(205 reviews)</span>
-                        </div>
-                        <div class="price-section">
-                            <p class="price">Rs 48,647</p>
-                            <p class="original-price"><s>Rs 57,935</s></p>
-                        </div>
-                        <button class="btn-primary-custom w-100">Add to Cart</button>
-                    </div>
-                </div>
+            <!-- Show More/Less Button -->
+            <div class="show-more-container">
+                <button class="btn-show-more" id="shopShowMoreBtn" onclick="toggleShop()">
+                    <i class="fas fa-chevron-down"></i> Show More
+                </button>
             </div>
         </div>
     </section>
@@ -322,5 +170,126 @@
             font-weight: bold;
             margin: 0;
         }
+
+        /* Show More/Less Button */
+        .show-more-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-show-more {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #ffffff;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-show-more:hover {
+            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-show-more i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-show-more.expanded i {
+            transform: rotate(180deg);
+        }
     </style>
+
+    <script>
+        let shopExpanded = false;
+        let currentCategory = 'all';
+        
+        // Shop page settings from backend
+        const shopSettings = {
+            showHomePage: {{ $shopPage?->show_home_page ? 'true' : 'false' }},
+            showAboutPage: {{ $shopPage?->show_about_page ? 'true' : 'false' }},
+            showShopByCategory: {{ $shopPage?->show_shop_by_category ? 'true' : 'false' }}
+        };
+
+        function filterCategory(category) {
+            currentCategory = category;
+            const items = document.querySelectorAll('.shop-product-item');
+            let visibleItems = [];
+            
+            items.forEach((item) => {
+                const categories = item.getAttribute('data-category').split(',');
+                if (categories.includes(category)) {
+                    visibleItems.push(item);
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Show only first 3 items
+            visibleItems.forEach((item, index) => {
+                if (index < 3) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Reset show more/less
+            shopExpanded = false;
+            const btn = document.getElementById('shopShowMoreBtn');
+            btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+            btn.classList.remove('expanded');
+        }
+
+        function toggleShop() {
+            const items = document.querySelectorAll('.shop-product-item');
+            const btn = document.getElementById('shopShowMoreBtn');
+            
+            // Get all items in current category
+            let visibleItems = [];
+            items.forEach((item) => {
+                const categories = item.getAttribute('data-category').split(',');
+                if (categories.includes(currentCategory)) {
+                    visibleItems.push(item);
+                }
+            });
+            
+            shopExpanded = !shopExpanded;
+            
+            if (shopExpanded) {
+                // Show 6 items (first 3 + 3 more)
+                visibleItems.forEach((item, index) => {
+                    if (index < 6) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+                btn.classList.add('expanded');
+            } else {
+                // Show only first 3 items
+                visibleItems.forEach((item, index) => {
+                    if (index < 3) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+                btn.classList.remove('expanded');
+            }
+        }
+    </script>
 @endsection
