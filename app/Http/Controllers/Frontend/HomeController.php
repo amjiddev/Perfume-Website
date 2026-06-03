@@ -34,7 +34,27 @@ class HomeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return view('frontend.home', compact('shopPage', 'products', 'perfumePage', 'bestSellers', 'reviews'));
+        // Get guest gifts
+        $guestGifts = \App\Models\GuestGift::where('is_active', true)->get();
+        
+        // Get home page settings
+        $homePage = \App\Models\HomePage::first() ?? \App\Models\HomePage::create([
+            'hero_heading' => 'Discover Luxury',
+            'hero_subheading' => 'Experience the finest collection of premium fragrances from around the world. Each scent tells a story of elegance and sophistication.',
+            'hero_image_1' => 'frontend/images/perfume1.jpg',
+            'hero_image_2' => 'frontend/images/perfume2.jpg',
+            'about_heading' => 'Almukhtar Perfume',
+            'about_description' => 'Almukhtar Perfume represents the pinnacle of luxury fragrance craftsmanship. With decades of expertise in perfumery, we curate the finest collection of long-lasting fragrances from around the world.',
+            'about_image' => 'frontend/images/perfume5.jfif',
+            'about_features' => [
+                'Premium quality fragrances',
+                'Long-lasting scents',
+                'Authentic & original products',
+                'Expert curation'
+            ]
+        ]);
+        
+        return view('frontend.home', compact('shopPage', 'products', 'perfumePage', 'bestSellers', 'reviews', 'guestGifts', 'homePage'));
     }
 }
 

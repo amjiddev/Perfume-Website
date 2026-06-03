@@ -6,16 +6,16 @@
     <!-- Hero Section with Slider -->
     <section class="hero-section" id="heroSlider">
         <div class="hero-slider-container">
-            <div class="hero-slide" style="background-image: url('{{ asset('frontend/images/perfume1.jpg') }}');"></div>
-            <div class="hero-slide" style="background-image: url('{{ asset('frontend/images/perfume2.jpg') }}');"></div>
+            <div class="hero-slide active" style="background-image: url('{{ asset($homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            <div class="hero-slide" style="background-image: url('{{ asset($homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
         </div>
         
         <div class="hero-overlay"></div>
         
         <div class="hero-content">
             <div class="hero-text">
-                <h1>Discover Luxury</h1>
-                <p>Experience the finest collection of premium fragrances from around the world. Each scent tells a story of elegance and sophistication.</p>
+                <h1>{{ $homePage->hero_heading }}</h1>
+                <p>{{ $homePage->hero_subheading }}</p>
                 <div class="hero-buttons">
                     <a href="/perfumes" class="btn-primary-custom">
                         <i class="fas fa-bottle-droplet"></i> Shop Perfumes
@@ -103,43 +103,44 @@
     @endif
     </section>
 
-    <!-- Our Products Section -->
-    <section class="page-content">
+    <!-- Guest Gift Section -->
+    <section class="page-content guest-gift-section">
         <div class="container">
-            <p class="collection-label">COLLECTION</p>
-            <h2 class="section-title">Our Products</h2>
-            <p class="section-subtitle">Each fragrance is a masterpiece — meticulously crafted to evoke emotion and leave a lasting impression.</p>
+            <p class="collection-label">SPECIAL OFFER</p>
+            <h2 class="section-title">Guest Gift</h2>
+            <p class="section-subtitle">Every guest who visits us receives a special gift. Explore our exclusive collection of complimentary gifts.</p>
             
-            <div class="row">
-                @forelse($products as $product)
-                    <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="product-card">
-                            <div class="product-image">
-                                <img src="{{ asset($product->image ?? 'frontend/images/perfume2.jpg') }}" alt="{{ $product->name }}" loading="lazy">
-                                @if($product->discount_percentage && $product->discount_percentage > 0)
-                                    <span class="sale-badge">-{{ $product->discount_percentage }}%</span>
-                                @endif
-                                <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+            <div class="row" id="guestGiftContainer">
+                @forelse($guestGifts as $gift)
+                    <div class="col-lg-4 col-md-6 mb-4 guest-gift-item" style="display: {{ $loop->index < 6 ? 'block' : 'none' }};">
+                        <div class="guest-gift-card" onclick="openGuestGiftModal('{{ $gift->title }}', '{{ asset($gift->image) }}')">
+                            <div class="guest-gift-image-container">
+                                <img src="{{ asset($gift->image) }}" alt="{{ $gift->title }}" class="guest-gift-image" loading="lazy">
                             </div>
-                            <h5>{{ $product->name }}</h5>
-                            <p class="product-description">{{ $product->description ?? 'Premium quality fragrance' }}</p>
-                            <div class="product-footer">
-                                <div class="price-section">
-                                    <p class="price">Rs {{ number_format($product->price, 0) }}</p>
-                                    @if($product->original_price)
-                                        <p class="original-price"><s>Rs {{ number_format($product->original_price, 0) }}</s></p>
-                                    @endif
+                            <div class="guest-gift-overlay">
+                                <div class="guest-gift-text">
+                                    <h5>{{ $gift->title }}</h5>
                                 </div>
-                                <a href="#" class="btn-view-details">View Details</a>
                             </div>
                         </div>
                     </div>
                 @empty
                     <div class="col-12 text-center py-5">
-                        <p class="text-muted">No featured products available</p>
+                        <p class="text-muted">No guest gifts available</p>
                     </div>
                 @endforelse
             </div>
+
+            @if($guestGifts->count() > 6)
+                <div class="text-center mt-4">
+                    <button class="btn btn-show-more" id="showMoreBtn" onclick="showMoreGifts()">
+                        <i class="fas fa-plus-circle"></i> Show More
+                    </button>
+                    <button class="btn btn-show-more" id="showLessBtn" onclick="showLessGifts()" style="display: none;">
+                        <i class="fas fa-minus-circle"></i> Show Less
+                    </button>
+                </div>
+            @endif
         </div>
     </section>
 
@@ -232,22 +233,26 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4">
-                    <img src="{{ asset('frontend/images/perfume5.jfif') }}" alt="Almukhtar Perfume - Luxury Brand" class="img-fluid" loading="lazy">
+                    <img src="{{ asset($homePage->about_image ?? 'frontend/images/perfume5.jfif') }}" alt="Almukhtar Perfume - Luxury Brand" class="img-fluid" loading="lazy">
                 </div>
                 <div class="col-lg-6">
                     <p class="collection-label">ABOUT US</p>
-                    <h2 class="section-title">Almukhtar Perfume</h2>
+                    <h2 class="section-title">{{ $homePage->about_heading }}</h2>
                     <p class="about-text">
-                        Almukhtar Perfume represents the pinnacle of luxury fragrance craftsmanship. With decades of expertise in perfumery, we curate the finest collection of long-lasting fragrances from around the world.
+                        {{ $homePage->about_description ?? 'Almukhtar Perfume represents the pinnacle of luxury fragrance craftsmanship. With decades of expertise in perfumery, we curate the finest collection of long-lasting fragrances from around the world.' }}
                     </p>
                     <p class="about-text">
                         Each scent in our collection is carefully selected for its authenticity, quality, and ability to evoke emotion. We believe that a perfect fragrance is more than just a scent — it's a statement of elegance and sophistication.
                     </p>
                     <ul class="about-features">
-                        <li><i class="fas fa-check"></i> Premium quality fragrances</li>
-                        <li><i class="fas fa-check"></i> Long-lasting scents</li>
-                        <li><i class="fas fa-check"></i> Authentic & original products</li>
-                        <li><i class="fas fa-check"></i> Expert curation</li>
+                        @forelse($homePage->about_features ?? [] as $feature)
+                            <li><i class="fas fa-check"></i> {{ $feature }}</li>
+                        @empty
+                            <li><i class="fas fa-check"></i> Premium quality fragrances</li>
+                            <li><i class="fas fa-check"></i> Long-lasting scents</li>
+                            <li><i class="fas fa-check"></i> Authentic & original products</li>
+                            <li><i class="fas fa-check"></i> Expert curation</li>
+                        @endforelse
                     </ul>
                 </div>
             </div>
@@ -255,44 +260,11 @@
     </section>
 
     <!-- Testimonials Section -->
+    @php
+        $reviews = \App\Models\Review::where('display_section', 'home')->get();
+    @endphp
     @if($reviews->count() > 0)
-    <section class="testimonials-section">
-        <div class="container">
-            <p class="collection-label">REVIEWS</p>
-            <h2 class="section-title">What Our Customers Say</h2>
-            
-            <div class="reviews-showcase">
-                <div class="review-card-large" id="mainReviewCard">
-                    <div class="review-quote-icon">"</div>
-                    <div class="review-stars-large">
-                        @for($i = 0; $i < 5; $i++)
-                        <i class="fas fa-star"></i>
-                        @endfor
-                    </div>
-                    <p class="review-text-large" id="mainReviewText">{{ $reviews->first()->text }}</p>
-                </div>
-
-                <div class="reviews-avatars-container">
-                    <div class="reviews-avatars" id="reviewsAvatars">
-                        @foreach($reviews->take(8) as $index => $review)
-                        <div class="avatar-item" onclick="changeMainReview({{ $index }})">
-                            @if($review->image)
-                            <img src="{{ asset($review->image) }}" alt="{{ $review->author }}" class="avatar-image" title="{{ $review->author }}">
-                            @else
-                            <div class="avatar-circle" title="{{ $review->author }}">
-                                {{ substr($review->author, 0, 1) }}
-                            </div>
-                            @endif
-                        </div>
-                        @endforeach
-                    </div>
-                    <button class="btn-leave-review">Leave a Review</button>
-                </div>
-
-                <p class="reviews-cta">Share your feedback with us and receive a promotional code worth 50,000 as our token of appreciation.</p>
-            </div>
-        </div>
-    </section>
+        @include('frontend.components.testimonials-section', ['reviews' => $reviews])
     @endif
 
     <!-- Newsletter Section -->
@@ -313,6 +285,124 @@
         .btn-subscribe:hover {
             background-color: #333333;
             transform: translateY(-2px);
+        }
+
+        /* Guest Gift Section Styles */
+        .guest-gift-section {
+            background-color: #ffffff;
+            padding: 4rem 0;
+        }
+
+        .guest-gift-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            height: 250px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .guest-gift-card:hover {
+            box-shadow: 0 15px 40px rgba(200, 169, 106, 0.25);
+            transform: translateY(-8px);
+        }
+
+        .guest-gift-image-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .guest-gift-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .guest-gift-card:hover .guest-gift-image {
+            transform: scale(1.1);
+        }
+
+        .guest-gift-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .guest-gift-card:hover .guest-gift-overlay {
+            opacity: 1;
+        }
+
+        .guest-gift-text {
+            color: #ffffff;
+            width: 100%;
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .guest-gift-text h5 {
+            color: #ffffff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            margin-top: 0;
+        }
+
+        .guest-gift-text p {
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Show More Button */
+        .btn-show-more {
+            background-color: #000000;
+            color: #ffffff;
+            border: 2px solid #000000;
+            padding: 0.8rem 2.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .btn-show-more:hover {
+            background-color: #333333;
+            border-color: #333333;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-show-more i {
+            font-size: 1.1rem;
         }
 
         /* Best Sellers Section Styles (matching perfume page) */
@@ -446,6 +536,23 @@
         }
 
         @media (max-width: 768px) {
+            .guest-gift-card {
+                height: 280px;
+            }
+
+            .guest-gift-text h5 {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .guest-gift-text p {
+                font-size: 0.85rem;
+            }
+
+            .guest-gift-overlay {
+                padding: 1.5rem;
+            }
+
             .product-image {
                 height: 250px;
             }
@@ -476,250 +583,262 @@
             }
         }
 
-        /* Reviews Showcase Styles */
-        .testimonials-section {
-            background-color: #ffffff;
-            padding: 4rem 0;
+        /* Swiper Styles */
+        .swiper {
+            padding: 2rem 0;
         }
 
-        .reviews-showcase {
+        .swiper-button-next,
+        .swiper-button-prev {
+            background-color: rgba(26, 124, 58, 0.9);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            background-color: #1a7c3a;
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 1.2rem;
+        }
+
+        .swiper-pagination-bullet {
+            background-color: #ddd;
+            opacity: 1;
+            transition: all 0.3s ease;
+            width: 12px;
+            height: 12px;
+        }
+
+        .swiper-pagination-bullet-active {
+            background-color: #1a7c3a;
+            width: 32px;
+            border-radius: 6px;
+        }
+
+        .swiper-pagination-bullet:hover {
+            background-color: #1a7c3a;
+        }
+
+        /* Guest Gift Modal Styles */
+        .guest-gift-modal-content {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        .guest-gift-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .guest-gift-close-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .guest-gift-modal-body {
+            padding: 0;
+            background-color: #ffffff;
             text-align: center;
         }
 
-        .review-card-large {
-            background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
-            color: #ffffff;
-            padding: 3rem 2rem;
-            border-radius: 20px;
-            margin-bottom: 2rem;
-            position: relative;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        .guest-gift-modal-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 0;
+            box-shadow: none;
+            transition: transform 0.3s ease;
         }
 
-        .review-quote-icon {
-            font-size: 4rem;
-            color: #ffc107;
-            opacity: 0.3;
-            position: absolute;
-            top: -10px;
-            left: 20px;
-            font-weight: bold;
+        .guest-gift-modal-image:hover {
+            transform: scale(1.02);
         }
 
-        .review-stars-large {
-            color: #ffc107;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            letter-spacing: 0.3rem;
-        }
-
-        .review-text-large {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin: 0;
-            font-style: italic;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .reviews-avatars-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .reviews-avatars {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .avatar-item {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .avatar-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid #e8e8e8;
-            object-fit: cover;
-            transition: all 0.3s ease;
-        }
-
-        .avatar-item:hover .avatar-image {
-            transform: scale(1.15);
-            border-color: #ffc107;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .avatar-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #000000 0%, #333333 100%);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.5rem;
-            border: 3px solid #e8e8e8;
-            transition: all 0.3s ease;
-        }
-
-        .avatar-item:hover .avatar-circle {
-            transform: scale(1.15);
-            border-color: #ffc107;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-leave-review {
-            background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+        .guest-gift-modal-title {
             color: #000000;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 25px;
+            font-size: 1.1rem;
             font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-        }
-
-        .btn-leave-review:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
-        }
-
-        .reviews-cta {
-            color: #666666;
-            font-size: 0.95rem;
-            margin-top: 1.5rem;
-            margin-bottom: 0;
+            margin: 1.2rem 1rem;
+            margin-bottom: 1rem;
         }
 
         @media (max-width: 768px) {
-            .review-card-large {
-                padding: 2rem 1.5rem;
-            }
-
-            .review-text-large {
+            .guest-gift-modal-title {
                 font-size: 1rem;
+                margin: 1rem 0.8rem;
             }
 
-            .avatar-circle {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
+            .guest-gift-close-btn {
+                width: 32px;
+                height: 32px;
+                top: 8px;
+                right: 8px;
+            }
+        }
+
+            .guest-gift-modal-image {
+                max-width: 100%;
             }
 
-            .reviews-avatars {
-                gap: 0.8rem;
+            .guest-gift-modal-header .modal-title {
+                font-size: 1.1rem;
             }
         }
     </style>
 
     <script>
-        let currentSlideIndex = 0;
-        const slides = document.querySelectorAll('.hero-slide');
-        const indicators = document.querySelectorAll('.indicator');
-        const totalSlides = slides.length;
-        let autoSlideTimer;
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentSlideIndex = 0;
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicators = document.querySelectorAll('.indicator');
+            const totalSlides = slides.length;
+            let autoSlideTimer;
 
-        // Initialize first slide
-        if (slides.length > 0) {
-            slides[0].classList.add('active');
-            startAutoSlide();
-        }
+            console.log('Hero slides found:', totalSlides);
 
-        function changeSlide(n) {
-            clearTimeout(autoSlideTimer);
-            currentSlideIndex += n;
-            if (currentSlideIndex >= totalSlides) {
-                currentSlideIndex = 0;
-            } else if (currentSlideIndex < 0) {
-                currentSlideIndex = totalSlides - 1;
+            function showSlide(n) {
+                slides.forEach(slide => slide.classList.remove('active'));
+                indicators.forEach(indicator => indicator.classList.remove('active'));
+                
+                if (slides[n]) {
+                    slides[n].classList.add('active');
+                }
+                if (indicators[n]) {
+                    indicators[n].classList.add('active');
+                }
             }
-            showSlide(currentSlideIndex);
-            startAutoSlide();
-        }
 
-        function currentSlide(n) {
-            clearTimeout(autoSlideTimer);
-            currentSlideIndex = n;
-            showSlide(currentSlideIndex);
-            startAutoSlide();
-        }
-
-        function showSlide(n) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            indicators.forEach(indicator => indicator.classList.remove('active'));
-            
-            if (slides[n]) {
-                slides[n].classList.add('active');
+            function startAutoSlide() {
+                autoSlideTimer = setTimeout(() => {
+                    currentSlideIndex++;
+                    if (currentSlideIndex >= totalSlides) {
+                        currentSlideIndex = 0;
+                    }
+                    console.log('Auto sliding to:', currentSlideIndex);
+                    showSlide(currentSlideIndex);
+                    startAutoSlide();
+                }, 5000); // Change slide every 5 seconds
             }
-            if (indicators[n]) {
-                indicators[n].classList.add('active');
-            }
-        }
 
-        function startAutoSlide() {
-            autoSlideTimer = setTimeout(() => {
-                currentSlideIndex++;
+            function changeSlide(n) {
+                clearTimeout(autoSlideTimer);
+                currentSlideIndex += n;
                 if (currentSlideIndex >= totalSlides) {
                     currentSlideIndex = 0;
+                } else if (currentSlideIndex < 0) {
+                    currentSlideIndex = totalSlides - 1;
                 }
                 showSlide(currentSlideIndex);
                 startAutoSlide();
-            }, 5000); // Change slide every 5 seconds
-        }
-
-        // Reviews Showcase Function
-        const allReviews = @json($reviews->take(8));
-        let currentReviewIndex = 0;
-        let reviewAutoSlideTimer;
-        
-        function changeMainReview(index) {
-            currentReviewIndex = index;
-            if (allReviews[index]) {
-                const review = allReviews[index];
-                document.getElementById('mainReviewText').textContent = review.text;
-                
-                // Update stars
-                let starsHtml = '';
-                for (let i = 0; i < Math.floor(review.rating); i++) {
-                    starsHtml += '<i class="fas fa-star"></i>';
-                }
-                if (review.rating % 1 !== 0) {
-                    starsHtml += '<i class="fas fa-star-half-alt"></i>';
-                }
-                document.querySelector('.review-stars-large').innerHTML = starsHtml;
             }
+
+            function currentSlide(n) {
+                clearTimeout(autoSlideTimer);
+                currentSlideIndex = n;
+                showSlide(currentSlideIndex);
+                startAutoSlide();
+            }
+
+            // Initialize first slide
+            if (slides.length > 0) {
+                showSlide(0);
+                startAutoSlide();
+            }
+
+            // Make functions globally accessible
+            window.changeSlide = changeSlide;
+            window.currentSlide = currentSlide;
+        });
+
+        // Reviews Carousel Slider
+        const reviewsCarousel = document.getElementById('reviewsCarousel');
+        const reviewItems = document.querySelectorAll('.review-card-item');
+        const itemsPerSlide = 4;
+        let currentSlide = 0;
+        let carouselAutoSlideTimer;
+
+        function getItemsPerSlide() {
+            if (window.innerWidth <= 480) return 1;
+            if (window.innerWidth <= 768) return 2;
+            if (window.innerWidth <= 1200) return 3;
+            return 4;
+        }
+
+        function updateCarouselPosition() {
+            const itemsToShow = getItemsPerSlide();
+            const itemWidth = 100 / itemsToShow;
+            const translateX = -currentSlide * itemWidth;
+            reviewsCarousel.style.transform = `translateX(${translateX}%)`;
             
-            // Reset auto-slide timer
-            clearTimeout(reviewAutoSlideTimer);
-            startReviewAutoSlide();
+            // Update indicators
+            const totalSlides = Math.ceil(reviewItems.length / itemsToShow);
+            document.querySelectorAll('.carousel-indicator').forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentSlide);
+            });
         }
 
-        function autoSlideReview() {
-            currentReviewIndex = (currentReviewIndex + 1) % allReviews.length;
-            changeMainReview(currentReviewIndex);
+        function nextReviewCarousel() {
+            const itemsToShow = getItemsPerSlide();
+            const maxSlide = Math.ceil(reviewItems.length / itemsToShow) - 1;
+            currentSlide = (currentSlide + 1) % (maxSlide + 1);
+            updateCarouselPosition();
+            clearTimeout(carouselAutoSlideTimer);
+            startCarouselAutoSlide();
         }
 
-        function startReviewAutoSlide() {
-            reviewAutoSlideTimer = setTimeout(autoSlideReview, 5000);
+        function prevReviewCarousel() {
+            const itemsToShow = getItemsPerSlide();
+            const maxSlide = Math.ceil(reviewItems.length / itemsToShow) - 1;
+            currentSlide = (currentSlide - 1 + maxSlide + 1) % (maxSlide + 1);
+            updateCarouselPosition();
+            clearTimeout(carouselAutoSlideTimer);
+            startCarouselAutoSlide();
         }
 
-        // Start auto-slide on page load
-        if (allReviews.length > 0) {
-            startReviewAutoSlide();
+        function goToCarouselSlide(index) {
+            currentSlide = index;
+            updateCarouselPosition();
+            clearTimeout(carouselAutoSlideTimer);
+            startCarouselAutoSlide();
+        }
+
+        function startCarouselAutoSlide() {
+            carouselAutoSlideTimer = setTimeout(() => {
+                nextReviewCarousel();
+            }, 5000);
+        }
+
+        // Initialize carousel
+        if (reviewItems.length > 0) {
+            updateCarouselPosition();
+            startCarouselAutoSlide();
+            
+            // Update on window resize
+            window.addEventListener('resize', updateCarouselPosition);
         }
     </script>
-@endsection
 
 
     <!-- Order Modal -->
@@ -809,8 +928,66 @@
         </div>
     </div>
 
+    <!-- Guest Gift Modal -->
+    <div class="modal fade" id="guestGiftModal" tabindex="-1" aria-labelledby="guestGiftModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content guest-gift-modal-content">
+                <button type="button" class="btn-close btn-close-white guest-gift-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body guest-gift-modal-body">
+                    <img id="giftImage" src="" alt="Gift" class="guest-gift-modal-image">
+                    <h5 id="giftTitle" class="guest-gift-modal-title">Gift</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentProductPrice = 0;
+
+        function openGuestGiftModal(title, image) {
+            document.getElementById('giftTitle').textContent = title;
+            document.getElementById('giftImage').src = image;
+            
+            const modal = new bootstrap.Modal(document.getElementById('guestGiftModal'));
+            modal.show();
+        }
+
+        function showMoreGifts() {
+            const items = document.querySelectorAll('.guest-gift-item');
+            let hiddenCount = 0;
+            
+            items.forEach((item) => {
+                if (item.style.display === 'none' && hiddenCount < 6) {
+                    item.style.display = 'block';
+                    hiddenCount++;
+                }
+            });
+            
+            // Check if all items are now visible
+            const remainingHidden = Array.from(items).some(item => item.style.display === 'none');
+            if (!remainingHidden) {
+                document.getElementById('showMoreBtn').style.display = 'none';
+                document.getElementById('showLessBtn').style.display = 'inline-flex';
+            }
+        }
+
+        function showLessGifts() {
+            const items = document.querySelectorAll('.guest-gift-item');
+            
+            items.forEach((item, index) => {
+                if (index >= 6) {
+                    item.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('showMoreBtn').style.display = 'inline-flex';
+            document.getElementById('showLessBtn').style.display = 'none';
+        }
+
+        function requestGift() {
+            const giftTitle = document.getElementById('giftTitle').textContent;
+            alert(`Thank you for your interest in "${giftTitle}"! Please visit our store or contact us to claim this complimentary gift.`);
+        }
 
         function setProductData(btn, productName, price, image) {
             currentProductPrice = price;
@@ -875,3 +1052,5 @@
             modal.hide();
         }
     </script>
+
+@endsection

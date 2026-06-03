@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Apps\AboutPageController;
+use App\Http\Controllers\Apps\ContactPageController;
+use App\Http\Controllers\Apps\FooterSettingsController;
+use App\Http\Controllers\Apps\GuestGiftController;
+use App\Http\Controllers\Apps\HomePageController;
 use App\Http\Controllers\Apps\PermissionManagementController;
 use App\Http\Controllers\Apps\PerfumePageController;
 use App\Http\Controllers\Apps\ReviewController;
@@ -30,6 +34,7 @@ Route::middleware(['admin_or_redirect'])->group(function () {
 
     Route::controller(LandingPageController::class)->prefix('admin/landing-page')->as('admin-landing-page.')->group(function () {
         Route::get('/', 'index')->name('list');
+        Route::put('/', 'update')->name('update');
     });
 
     Route::controller(ShopPageController::class)->prefix('admin/shop-page')->as('admin.shop-page.')->group(function () {
@@ -45,6 +50,18 @@ Route::middleware(['admin_or_redirect'])->group(function () {
         Route::put('/', 'update')->name('update');
     });
 
+    Route::controller(ContactPageController::class)->prefix('admin/contact-page')->as('admin.contact-page.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('/', 'update')->name('update');
+    });
+
+    Route::controller(GuestGiftController::class)->prefix('admin/guest-gift')->as('admin.guest-gift.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::put('{guestGift}', 'update')->name('update');
+        Route::delete('{guestGift}', 'delete')->name('delete');
+    });
+
     Route::controller(PerfumePageController::class)->prefix('admin/perfume-page')->as('admin.perfume-page.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/', 'update')->name('update');
@@ -58,6 +75,17 @@ Route::middleware(['admin_or_redirect'])->group(function () {
         Route::post('/', 'store')->name('store');
         Route::put('{review}', 'update')->name('update');
         Route::delete('{review}', 'delete')->name('delete');
+    });
+
+    Route::controller(HomePageController::class)->prefix('admin/home-page')->as('admin.home-page.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('/', 'update')->name('update');
+    });
+
+    Route::controller(FooterSettingsController::class)->prefix('admin/footer-settings')->as('admin.footer-settings.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('edit', 'edit')->name('edit');
+        Route::put('/', 'update')->name('update');
     });
 });
 

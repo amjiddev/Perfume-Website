@@ -76,4 +76,11 @@ trait UploadImageTrait
             'error' => ['message' => 'File upload failed.']
         ]);
     }
+
+    public function deleteImage($filePath)
+    {
+        if ($filePath && Storage::disk('public')->exists($filePath)) {
+            Storage::disk('public')->delete($filePath);
+        }
+    }
 }

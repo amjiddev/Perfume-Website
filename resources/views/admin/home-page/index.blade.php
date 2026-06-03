@@ -1,7 +1,10 @@
+@extends('layout.master')
+
+@section('content')
 <x-default-layout>
 
     @section('title')
-        Landing Page - Home Page Settings
+        Home Page Settings
     @endsection
 
     @section('breadcrumbs')
@@ -34,7 +37,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin-landing-page.update') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.home-page.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -48,7 +51,7 @@
                                     <label for="hero_heading" class="form-label">Hero Heading</label>
                                     <input type="text" class="form-control @error('hero_heading') is-invalid @enderror" 
                                            id="hero_heading" name="hero_heading" 
-                                           value="{{ old('hero_heading', $homePage->hero_heading ?? 'Discover Luxury') }}" placeholder="e.g., Discover Luxury">
+                                           value="{{ old('hero_heading', $homePage->hero_heading) }}" placeholder="e.g., Discover Luxury">
                                     @error('hero_heading')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -57,7 +60,7 @@
                                 <div class="mb-3">
                                     <label for="hero_subheading" class="form-label">Hero Subheading</label>
                                     <textarea class="form-control @error('hero_subheading') is-invalid @enderror" 
-                                              id="hero_subheading" name="hero_subheading" rows="3">{{ old('hero_subheading', $homePage->hero_subheading ?? '') }}</textarea>
+                                              id="hero_subheading" name="hero_subheading" rows="3">{{ old('hero_subheading', $homePage->hero_subheading) }}</textarea>
                                     @error('hero_subheading')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -110,7 +113,7 @@
                                     <label for="about_heading" class="form-label">About Heading</label>
                                     <input type="text" class="form-control @error('about_heading') is-invalid @enderror" 
                                            id="about_heading" name="about_heading" 
-                                           value="{{ old('about_heading', $homePage->about_heading ?? 'Almukhtar Perfume') }}" placeholder="e.g., Almukhtar Perfume">
+                                           value="{{ old('about_heading', $homePage->about_heading) }}" placeholder="e.g., Almukhtar Perfume">
                                     @error('about_heading')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -119,7 +122,7 @@
                                 <div class="mb-3">
                                     <label for="about_description" class="form-label">About Description</label>
                                     <textarea class="form-control @error('about_description') is-invalid @enderror" 
-                                              id="about_description" name="about_description" rows="4">{{ old('about_description', $homePage->about_description ?? '') }}</textarea>
+                                              id="about_description" name="about_description" rows="4">{{ old('about_description', $homePage->about_description) }}</textarea>
                                     @error('about_description')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -168,33 +171,6 @@
                             </div>
                         </div>
 
-                        <!-- Footer Section -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">Footer Settings</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="company_name" class="form-label">Company Name</label>
-                                    <input type="text" class="form-control @error('company_name') is-invalid @enderror" 
-                                           id="company_name" name="company_name" 
-                                           value="{{ old('company_name', $footerSettings->company_name ?? 'Almukhtar Perfume') }}" placeholder="e.g., Almukhtar Perfume">
-                                    @error('company_name')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="company_description" class="form-label">Company Description</label>
-                                    <textarea class="form-control @error('company_description') is-invalid @enderror" 
-                                              id="company_description" name="company_description" rows="3">{{ old('company_description', $footerSettings->company_description ?? '') }}</textarea>
-                                    @error('company_description')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="d-flex gap-2 mb-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bx bx-save me-2"></i>Save Changes
@@ -207,6 +183,7 @@
     </div>
 
 </x-default-layout>
+@endsection
 
 <script>
 function addFeature() {
@@ -226,4 +203,3 @@ function removeFeature(btn) {
     btn.parentElement.remove();
 }
 </script>
-

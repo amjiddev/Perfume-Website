@@ -129,47 +129,6 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    @if($reviews->count() > 0)
-    <section class="testimonials-attar">
-        <div class="container">
-            <p class="collection-label">CUSTOMER REVIEWS</p>
-            <h2 class="section-title">What Our Customers Say</h2>
-            
-            <div class="reviews-showcase">
-                <div class="review-card-large" id="mainReviewCardAttar">
-                    <div class="review-quote-icon">"</div>
-                    <div class="review-stars-large">
-                        @for($i = 0; $i < 5; $i++)
-                        <i class="fas fa-star"></i>
-                        @endfor
-                    </div>
-                    <p class="review-text-large" id="mainReviewTextAttar">{{ $reviews->first()->text }}</p>
-                </div>
-
-                <div class="reviews-avatars-container">
-                    <div class="reviews-avatars" id="attarReviewsAvatars">
-                        @foreach($reviews->take(8) as $index => $review)
-                        <div class="avatar-item" onclick="changeMainReviewAttar({{ $index }})">
-                            @if($review->image)
-                            <img src="{{ asset($review->image) }}" alt="{{ $review->author }}" class="avatar-image" title="{{ $review->author }}">
-                            @else
-                            <div class="avatar-circle" title="{{ $review->author }}">
-                                {{ substr($review->author, 0, 1) }}
-                            </div>
-                            @endif
-                        </div>
-                        @endforeach
-                    </div>
-                    <button class="btn-leave-review">Leave a Review</button>
-                </div>
-
-                <p class="reviews-cta">Share your feedback with us and receive a promotional code worth 50,000 as our token of appreciation.</p>
-            </div>
-        </div>
-    </section>
-    @endif
-
     <style>
         /* Attar Page Specific Styles */
         .attar-section {
@@ -634,45 +593,6 @@
             }
         }
 
-        // Attar Reviews Showcase Function
-        const allAttarReviews = @json($reviews->take(8));
-        let currentAttarReviewIndex = 0;
-        let attarReviewAutoSlideTimer;
-        
-        function changeMainReviewAttar(index) {
-            currentAttarReviewIndex = index;
-            if (allAttarReviews[index]) {
-                const review = allAttarReviews[index];
-                document.getElementById('mainReviewTextAttar').textContent = review.text;
-                
-                // Update stars
-                let starsHtml = '';
-                for (let i = 0; i < Math.floor(review.rating); i++) {
-                    starsHtml += '<i class="fas fa-star"></i>';
-                }
-                if (review.rating % 1 !== 0) {
-                    starsHtml += '<i class="fas fa-star-half-alt"></i>';
-                }
-                document.querySelectorAll('.review-stars-large')[0].innerHTML = starsHtml;
-            }
-            
-            // Reset auto-slide timer
-            clearTimeout(attarReviewAutoSlideTimer);
-            startAttarReviewAutoSlide();
-        }
-
-        function autoSlideAttarReview() {
-            currentAttarReviewIndex = (currentAttarReviewIndex + 1) % allAttarReviews.length;
-            changeMainReviewAttar(currentAttarReviewIndex);
-        }
-
-        function startAttarReviewAutoSlide() {
-            attarReviewAutoSlideTimer = setTimeout(autoSlideAttarReview, 5000);
-        }
-
-        // Start auto-slide on page load
-        if (allAttarReviews.length > 0) {
-            startAttarReviewAutoSlide();
-        }
+        // Attar Reviews Showcase Function removed
     </script>
 @endsection

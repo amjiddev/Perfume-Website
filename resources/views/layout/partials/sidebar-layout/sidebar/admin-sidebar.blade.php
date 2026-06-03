@@ -54,6 +54,24 @@
                 </a>
             </div>
             <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.contact-page.*') ? 'active' : '' }}"
+                    href="{{ route('admin.contact-page.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('Contact Page') }}</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.guest-gift.*') ? 'active' : '' }}"
+                    href="{{ route('admin.guest-gift.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('Guest Gifts') }}</span>
+                </a>
+            </div>
+            <div class="menu-item">
                 <a class="menu-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}"
                     href="{{ route('admin.reviews.index') }}">
                     <span class="menu-bullet">

@@ -29,12 +29,6 @@
                 </li>
             </ul>
             <div class="navbar-icons">
-                <div class="search-box-wrapper">
-                    <input type="text" class="search-box" id="searchInput" placeholder="Search perfumes...">
-                    <button class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
             </div>
         </div>
     </div>

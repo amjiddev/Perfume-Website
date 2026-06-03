@@ -59,7 +59,20 @@ class PerfumeController extends Controller
 
     public function contact()
     {
-        return view('frontend.contact');
+        $contactPage = \App\Models\ContactPage::first() ?? \App\Models\ContactPage::create([
+            'title' => 'Contact Us',
+            'hero_heading' => 'Get In Touch',
+            'hero_subheading' => 'We\'d love to hear from you. Send us a message and we\'ll respond as soon as possible.',
+            'description' => 'Have questions about our fragrances? Need assistance with an order? Our dedicated team is here to help.',
+            'phone' => '+92 (0) 300 1234567',
+            'email' => 'info@almukhtar.com',
+            'address' => 'Almukhtar Perfume Store, Main Street, Karachi, Pakistan',
+            'office_hours' => 'Monday - Friday: 10:00 AM - 6:00 PM\nSaturday: 11:00 AM - 5:00 PM\nSunday: Closed',
+            'contact_form_title' => 'Send us a Message',
+            'contact_form_description' => 'Fill out the form below and we\'ll get back to you within 24 hours.',
+        ]);
+        
+        return view('frontend.contact', compact('contactPage'));
     }
 
     public function productDetail($id)
