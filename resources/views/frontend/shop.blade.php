@@ -68,7 +68,13 @@
                                     <p class="original-price"><s>Rs {{ number_format($product->original_price, 0) }}</s></p>
                                 @endif
                             </div>
-                            <button class="btn-primary-custom w-100">Add to Cart</button>
+                            <button class="btn-primary-custom w-100 add-to-cart-btn" 
+                                    data-product-id="{{ $product->id }}" 
+                                    data-product-name="{{ $product->name }}" 
+                                    data-product-price="{{ $product->price ?? 0 }}" 
+                                    data-product-image="{{ asset($product->image ?? 'frontend/images/perfume2.jpg') }}">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
                         </div>
                     </div>
                 @empty

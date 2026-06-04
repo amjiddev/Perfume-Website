@@ -588,35 +588,6 @@
             }
         }
 
-        /* Cart Notification */
-        .cart-notification {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #00aa00;
-            color: #ffffff;
-            padding: 1rem 1.5rem;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            font-weight: 600;
-            z-index: 9999;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 170, 0, 0.3);
-        }
-
-        .cart-notification.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .cart-notification i {
-            font-size: 1.2rem;
-        }
-
         /* Swiper Styles */
         .swiper {
             padding: 2rem 0;
@@ -871,68 +842,6 @@
             
             // Update on window resize
             window.addEventListener('resize', updateCarouselPosition);
-        }
-
-        // Add to Cart Function
-        function addToCart(productId, productName, productPrice, productImage) {
-            // Validate inputs
-            if (!productId || !productName || !productPrice || !productImage) {
-                console.error('Invalid product data:', { productId, productName, productPrice, productImage });
-                alert('Error: Invalid product data');
-                return;
-            }
-
-            const product = {
-                id: parseInt(productId),
-                name: productName.trim(),
-                price: parseFloat(productPrice),
-                image: productImage,
-                quantity: 1
-            };
-
-            // Check if cart manager is available
-            if (typeof cartManager === 'undefined') {
-                console.error('Cart manager not available');
-                alert('Error: Cart system not loaded. Please refresh the page.');
-                return;
-            }
-
-            cartManager.addItem(product);
-            showNotification('Added to cart!');
-        }
-
-        // Event listeners for add to cart buttons using data attributes
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-product-id');
-                    const productName = this.getAttribute('data-product-name');
-                    const productPrice = this.getAttribute('data-product-price');
-                    const productImage = this.getAttribute('data-product-image');
-                    
-                    addToCart(productId, productName, productPrice, productImage);
-                });
-            });
-        });
-
-        // Show notification
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'cart-notification';
-            notification.innerHTML = `
-                <i class="fas fa-check-circle"></i>
-                <span>${message}</span>
-            `;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 10);
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
         }
     </script>
 

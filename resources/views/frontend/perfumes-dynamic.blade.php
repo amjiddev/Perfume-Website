@@ -103,7 +103,13 @@
                                     @elseif($perfume->original_price)
                                         <p class="price-perfume">Rs {{ number_format($perfume->original_price) }}</p>
                                     @endif
-                                    <a href="#" class="btn-shop-now-perfume">Shop Now</a>
+                                    <button class="btn-shop-now-perfume add-to-cart-btn" 
+                                            data-product-id="{{ $perfume->id }}" 
+                                            data-product-name="{{ $perfume->name }}" 
+                                            data-product-price="{{ $perfume->price ?? $perfume->original_price ?? 0 }}" 
+                                            data-product-image="{{ asset($perfume->image ?? 'https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?w=300&h=400&fit=crop') }}">
+                                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                                    </button>
                                 </div>
                             </div>
                         </div>

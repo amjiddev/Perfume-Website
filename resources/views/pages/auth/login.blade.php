@@ -2,7 +2,7 @@
 
     <!--begin::Form-->
     <form class="form w-100" novalidate="novalidate" id="kt_sign_in_form" data-kt-redirect-url="{{ route('dashboard') }}"
-        action="{{ route('login') }}">
+        action="{{ route('login') }}" method="POST">
         @csrf
         <!--begin::Heading-->
         <div class="text-center mb-11">
@@ -11,42 +11,18 @@
                 Sign In
             </h1>
             <!--end::Title-->
-
-            {{-- <div class="text-gray-500 fw-semibold fs-6">
-                Your Social Campaigns
-            </div> --}}
         </div>
-
-        {{-- <div class="row g-3 mb-9">
-            <div class="col-md-6">
-                <a href="{{ url('/auth/redirect/google') }}?redirect_uri={{ url()->current() }}"
-                    class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
-                    <img alt="Logo" src="{{ image('svg/brand-logos/google-icon.svg') }}" class="h-15px me-3" />
-                    Sign in with Google
-                </a>
-            </div>
-
-            <div class="col-md-6">
-                <a href="#"
-                    class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
-                    <img alt="Logo" src="{{ image('svg/brand-logos/apple-black.svg') }}"
-                        class="theme-light-show h-15px me-3" />
-                    <img alt="Logo" src="{{ image('svg/brand-logos/apple-black-dark.svg') }}"
-                        class="theme-dark-show h-15px me-3" />
-                    Sign in with Apple
-                </a>
-            </div>
-        </div>
-
-        <div class="separator separator-content my-14">
-            <span class="w-125px text-gray-500 fw-semibold fs-7">Or with email</span>
-        </div> --}}
 
         <!--begin::Input group--->
         <div class="fv-row mb-8 position-relative">
             <!--begin::Email-->
             <input type="text" placeholder="Email" name="email" autocomplete="off"
-                class="form-control bg-transparent" value="" />
+                class="form-control bg-transparent" value="{{ old('email') }}" />
+            @error('email')
+                <div class="fv-plugins-message-container">
+                    <div class="fv-help-block"><span role="alert">{{ $message }}</span></div>
+                </div>
+            @enderror
             <!--end::Email-->
         </div>
 
@@ -60,6 +36,11 @@
                 <i class="bi bi-eye-slash fs-2"></i>
                 <i class="bi bi-eye fs-2 d-none"></i>
             </span>
+            @error('password')
+                <div class="fv-plugins-message-container">
+                    <div class="fv-help-block"><span role="alert">{{ $message }}</span></div>
+                </div>
+            @enderror
             <!--end::Password-->
         </div>
         <!--end::Input group--->
@@ -113,40 +94,6 @@
                 eye.classList.add('d-none');
             }
         }
-        
-        // Remove duplicate validation error messages
-        document.addEventListener('DOMContentLoaded', function() {
-            // Use MutationObserver to watch for dynamically added error messages
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.addedNodes.length) {
-                        removeDuplicateErrors();
-                    }
-                });
-            });
-            
-            // Start observing the form
-            const form = document.querySelector('#kt_sign_in_form');
-            if (form) {
-                observer.observe(form, {
-                    childList: true,
-                    subtree: true
-                });
-            }
-            
-            function removeDuplicateErrors() {
-                const errorContainers = document.querySelectorAll('.fv-row');
-                errorContainers.forEach(function(container) {
-                    const messages = container.querySelectorAll('.fv-plugins-message-container');
-                    if (messages.length > 1) {
-                        // Keep only the first error message, remove the rest
-                        for (let i = 1; i < messages.length; i++) {
-                            messages[i].remove();
-                        }
-                    }
-                });
-            }
-        });
     </script>
     @endpush
 
