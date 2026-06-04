@@ -19,5 +19,6 @@ Route::get('/shop', [PerfumeController::class, 'shop'])->name('shop');
 Route::get('/perfumes', [PerfumePageController::class, 'index'])->name('perfumes');
 Route::get('/attar', [PerfumeController::class, 'attar'])->name('attar');
 Route::get('/product/{id}', [PerfumeController::class, 'productDetail'])->name('product.detail');
+Route::get('/checkout', [PerfumeController::class, 'checkout'])->name('checkout');
 Route::get('/about', [PerfumeController::class, 'about'])->name('about');
 Route::get('/contact', [PerfumeController::class, 'contact'])->name('contact');

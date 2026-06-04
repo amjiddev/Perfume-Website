@@ -50,53 +50,35 @@
             <h2 class="section-title">Shop by Category</h2>
             
             <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <a href="{{ route('shop') }}" class="category-card-link">
-                        <div class="category-card">
-                            <div class="category-image">
-                                <img src="{{ asset('frontend/images/perfume2.jpg') }}" alt="Perfumes for Men">
+                @php
+                    $categories = [
+                        'men' => ['title' => 'For Men', 'description' => 'Bold & Masculine Fragrances'],
+                        'women' => ['title' => 'For Women', 'description' => 'Elegant & Feminine Scents'],
+                        'unisex' => ['title' => 'Unisex', 'description' => 'Versatile & Universal Fragrances'],
+                        'arabic' => ['title' => 'Arabic Perfumes', 'description' => 'Traditional & Luxurious Oud'],
+                    ];
+                @endphp
+                
+                @foreach($categories as $categoryKey => $categoryData)
+                    @php
+                        $categoryProduct = \App\Models\Product::where('category', $categoryKey)->first();
+                    @endphp
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <a href="{{ route('shop') }}" class="category-card-link">
+                            <div class="category-card">
+                                <div class="category-image">
+                                    @if($categoryProduct && $categoryProduct->image)
+                                        <img src="{{ asset($categoryProduct->image) }}" alt="{{ $categoryData['title'] }}" loading="lazy">
+                                    @else
+                                        <img src="{{ asset('frontend/images/perfume-placeholder.jpg') }}" alt="{{ $categoryData['title'] }}">
+                                    @endif
+                                </div>
+                                <h5>{{ $categoryData['title'] }}</h5>
+                                <p>{{ $categoryData['description'] }}</p>
                             </div>
-                            <h5>For Men</h5>
-                            <p>Bold & Masculine Fragrances</p>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <a href="{{ route('shop') }}" class="category-card-link">
-                        <div class="category-card">
-                            <div class="category-image">
-                                <img src="{{ asset('frontend/images/perfume3.jfif') }}" alt="Perfumes for Women">
-                            </div>
-                            <h5>For Women</h5>
-                            <p>Elegant & Feminine Scents</p>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <a href="{{ route('shop') }}" class="category-card-link">
-                        <div class="category-card">
-                            <div class="category-image">
-                                <img src="{{ asset('frontend/images/perfume6.jfif') }}" alt="Unisex Perfumes">
-                            </div>
-                            <h5>Unisex</h5>
-                            <p>Versatile & Universal Fragrances</p>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <a href="{{ route('shop') }}" class="category-card-link">
-                        <div class="category-card">
-                            <div class="category-image">
-                                <img src="{{ asset('frontend/images/perfume7.jfif') }}" alt="Arabic Perfumes">
-                            </div>
-                            <h5>Arabic Perfumes</h5>
-                            <p>Traditional & Luxurious Oud</p>
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -155,7 +137,9 @@
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="best-seller-card-perfume">
                             <div class="best-seller-image">
-                                <img src="{{ asset($perfume->image ?? 'frontend/images/perfume1.jpg') }}" alt="{{ $perfume->name }} - Best Selling Perfume" loading="lazy">
+                                <a href="{{ route('product.detail', $perfume->id) }}" class="product-image-link">
+                                    <img src="{{ asset($perfume->image ?? 'frontend/images/perfume1.jpg') }}" alt="{{ $perfume->name }} - Best Selling Perfume" loading="lazy">
+                                </a>
                                 @if($perfume->discount_percentage)
                                     <span class="sale-badge">-{{ $perfume->discount_percentage }}%</span>
                                 @endif
@@ -179,7 +163,13 @@
                                 @elseif($perfume->original_price)
                                     <p class="price-perfume">Rs {{ number_format($perfume->original_price) }}</p>
                                 @endif
-                                <a href="#" class="btn-shop-now-perfume">Shop Now</a>
+                                <button class="btn-shop-now-perfume add-to-cart-btn" 
+                                        data-product-id="{{ $perfume->id }}" 
+                                        data-product-name="{{ $perfume->name }}" 
+                                        data-product-price="{{ $perfume->price ?? 0 }}" 
+                                        data-product-image="{{ asset($perfume->image) }}">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -411,6 +401,12 @@
             padding: 4rem 0;
         }
 
+        .best-seller-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
         .best-seller-card-perfume {
             background-color: #ffffff;
             border: 1px solid #e8e8e8;
@@ -418,12 +414,19 @@
             overflow: hidden;
             transition: all 0.3s ease;
             text-align: center;
+            height: 100%;
         }
 
-        .best-seller-card-perfume:hover {
+        .best-seller-card-link:hover .best-seller-card-perfume {
             border-color: #000000;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
             transform: translateY(-8px);
+        }
+
+        .product-image-link {
+            display: block;
+            overflow: hidden;
+            cursor: pointer;
         }
 
         .best-seller-image {
@@ -506,12 +509,14 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
-            text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             margin-top: 1rem;
         }
 
-        .btn-shop-now-perfume:hover {
+        .best-seller-card-perfume:hover .btn-shop-now-perfume {
             background-color: #333333;
             color: #ffffff;
             transform: translateY(-3px);
@@ -581,6 +586,35 @@
             .newsletter-content h2 {
                 font-size: 1.8rem;
             }
+        }
+
+        /* Cart Notification */
+        .cart-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #00aa00;
+            color: #ffffff;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 170, 0, 0.3);
+        }
+
+        .cart-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cart-notification i {
+            font-size: 1.2rem;
         }
 
         /* Swiper Styles */
@@ -837,6 +871,68 @@
             
             // Update on window resize
             window.addEventListener('resize', updateCarouselPosition);
+        }
+
+        // Add to Cart Function
+        function addToCart(productId, productName, productPrice, productImage) {
+            // Validate inputs
+            if (!productId || !productName || !productPrice || !productImage) {
+                console.error('Invalid product data:', { productId, productName, productPrice, productImage });
+                alert('Error: Invalid product data');
+                return;
+            }
+
+            const product = {
+                id: parseInt(productId),
+                name: productName.trim(),
+                price: parseFloat(productPrice),
+                image: productImage,
+                quantity: 1
+            };
+
+            // Check if cart manager is available
+            if (typeof cartManager === 'undefined') {
+                console.error('Cart manager not available');
+                alert('Error: Cart system not loaded. Please refresh the page.');
+                return;
+            }
+
+            cartManager.addItem(product);
+            showNotification('Added to cart!');
+        }
+
+        // Event listeners for add to cart buttons using data attributes
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    const productName = this.getAttribute('data-product-name');
+                    const productPrice = this.getAttribute('data-product-price');
+                    const productImage = this.getAttribute('data-product-image');
+                    
+                    addToCart(productId, productName, productPrice, productImage);
+                });
+            });
+        });
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
         }
     </script>
 

@@ -77,12 +77,60 @@ class PerfumeController extends Controller
 
     public function productDetail($id)
     {
-        $product = Products::getById($id);
-        $relatedProducts = Products::getRelated($id);
+        // Try to get from Perfume model first (for best sellers)
+        $product = \App\Models\Perfume::find($id);
+        
+        // If not found in Perfume model, try the Products data class
+        if (!$product) {
+            $productData = Products::getById($id);
+            if (!$productData) {
+                abort(404, 'Product not found');
+            }
+            return view('frontend.product-detail', [
+                'product' => (object)$productData,
+                'relatedProducts' => array_map(function($p) { return (object)$p; }, Products::getRelated($id))
+            ]);
+        }
+        
+        // Convert Perfume model to array-like structure for view compatibility
+        $product = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'image' => $product->image,
+            'price' => $product->price,
+            'original_price' => $product->original_price,
+            'discount_percentage' => $product->discount_percentage ?? 0,
+            'rating' => $product->rating ?? 0,
+            'reviews_count' => $product->reviews_count ?? 0,
+            'description' => $product->description,
+            'features' => $product->features ? (is_array($product->features) ? $product->features : json_decode($product->features, true)) : []
+        ];
+        
+        // Get related products from Perfume model
+        $relatedProducts = \App\Models\Perfume::where('id', '!=', $id)
+            ->limit(4)
+            ->get()
+            ->map(function($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'image' => $p->image,
+                    'price' => $p->price,
+                    'original_price' => $p->original_price,
+                    'discount_percentage' => $p->discount_percentage ?? 0,
+                    'description' => $p->description
+                ];
+            })
+            ->toArray();
         
         return view('frontend.product-detail', [
             'product' => $product,
             'relatedProducts' => $relatedProducts
         ]);
+    }
+
+    public function checkout()
+    {
+        return view('frontend.checkout');
     }
 }

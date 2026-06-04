@@ -172,6 +172,41 @@
 
     @include('frontend.layouts.partials.navbar')
 
+    <!-- Cart Drawer -->
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-drawer-header">
+            <div class="cart-drawer-title">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Your Cart</span>
+                <span class="cart-count-badge" id="drawerBadge">0</span>
+            </div>
+            <button class="cart-close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="cart-drawer-content">
+            <div class="cart-items-container" id="cartItems"></div>
+            <div class="cart-empty-message" id="cartEmpty" style="display: none;">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Your cart is empty</p>
+            </div>
+        </div>
+
+        <div class="cart-drawer-footer">
+            <div class="cart-subtotal">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">Rs 0</span>
+            </div>
+            <a href="{{ route('checkout') }}" class="btn-checkout">
+                <i class="fas fa-arrow-right"></i> Proceed to Checkout
+            </a>
+            <a href="{{ route('shop') }}" class="btn-continue-shopping">
+                Continue Shopping
+            </a>
+        </div>
+    </div>
+
     <!-- Main Content -->
     @yield('content')
 
@@ -202,6 +237,201 @@
 
         // Auto-rotate promo banner every 5 seconds
         setInterval(nextPromo, 5000);
+
+        // Cart Management System
+        const cartManager = {
+            items: [],
+
+            init() {
+                this.loadCart();
+                this.updateBadge();
+                this.updateCartDrawer();
+                this.setupCartEvents();
+            },
+
+            loadCart() {
+                const saved = localStorage.getItem('perfume_cart');
+                this.items = saved ? JSON.parse(saved) : [];
+            },
+
+            saveCart() {
+                localStorage.setItem('perfume_cart', JSON.stringify(this.items));
+            },
+
+            addItem(product) {
+                const existing = this.items.find(item => item.id === product.id);
+                if (existing) {
+                    existing.quantity += product.quantity;
+                } else {
+                    this.items.push(product);
+                }
+                this.saveCart();
+                this.updateBadge();
+                this.updateCartDrawer();
+            },
+
+            removeItem(productId) {
+                this.items = this.items.filter(item => item.id !== productId);
+                this.saveCart();
+                this.updateBadge();
+                this.updateCartDrawer();
+            },
+
+            updateQuantity(productId, quantity) {
+                const item = this.items.find(item => item.id === productId);
+                if (item) {
+                    item.quantity = Math.max(1, quantity);
+                    this.saveCart();
+                    this.updateBadge();
+                    this.updateCartDrawer();
+                }
+            },
+
+            getTotalItems() {
+                return this.items.reduce((sum, item) => sum + item.quantity, 0);
+            },
+
+            getSubtotal() {
+                return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            },
+
+            updateBadge() {
+                const badge = document.getElementById('cartBadge');
+                const drawerBadge = document.getElementById('drawerBadge');
+                const total = this.getTotalItems();
+                
+                if (badge) {
+                    if (total > 0) {
+                        badge.textContent = total;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+
+                if (drawerBadge) {
+                    drawerBadge.textContent = total;
+                }
+            },
+
+            setupCartEvents() {
+                const cartLink = document.querySelector('.navbar-cart-link');
+                if (cartLink) {
+                    cartLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.toggleCartDrawer();
+                    });
+                }
+            },
+
+            toggleCartDrawer() {
+                const drawer = document.getElementById('cartDrawer');
+                if (drawer) {
+                    drawer.classList.toggle('open');
+                }
+            },
+
+            updateCartDrawer() {
+                const itemsContainer = document.getElementById('cartItems');
+                const subtotal = document.getElementById('cartSubtotal');
+                const emptyMessage = document.getElementById('cartEmpty');
+
+                if (!itemsContainer) return;
+
+                if (this.items.length === 0) {
+                    itemsContainer.innerHTML = '';
+                    if (emptyMessage) emptyMessage.style.display = 'block';
+                    if (subtotal) subtotal.textContent = 'Rs 0';
+                    return;
+                }
+
+                if (emptyMessage) emptyMessage.style.display = 'none';
+
+                itemsContainer.innerHTML = this.items.map(item => `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h6>${item.name}</h6>
+                            <p class="cart-item-price">Rs ${(item.price * item.quantity).toLocaleString()}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="cart-quantity-control">
+                                <button class="cart-qty-minus" data-product-id="${item.id}" data-quantity="${item.quantity}">−</button>
+                                <input type="number" value="${item.quantity}" readonly>
+                                <button class="cart-qty-plus" data-product-id="${item.id}" data-quantity="${item.quantity}">+</button>
+                            </div>
+                            <button class="cart-remove-btn" data-product-id="${item.id}" title="Remove">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add event listeners to quantity buttons
+                itemsContainer.querySelectorAll('.cart-qty-minus').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const productId = parseInt(btn.getAttribute('data-product-id'));
+                        const quantity = parseInt(btn.getAttribute('data-quantity'));
+                        this.updateQuantity(productId, quantity - 1);
+                    });
+                });
+
+                itemsContainer.querySelectorAll('.cart-qty-plus').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const productId = parseInt(btn.getAttribute('data-product-id'));
+                        const quantity = parseInt(btn.getAttribute('data-quantity'));
+                        this.updateQuantity(productId, quantity + 1);
+                    });
+                });
+
+                itemsContainer.querySelectorAll('.cart-remove-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const productId = parseInt(btn.getAttribute('data-product-id'));
+                        this.removeItem(productId);
+                    });
+                });
+
+                if (subtotal) {
+                    subtotal.textContent = 'Rs ' + this.getSubtotal().toLocaleString();
+                }
+            }
+        };
+
+        // Initialize cart on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            cartManager.init();
+        });
+
+        // Update cart when page becomes visible (switching tabs)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                cartManager.init();
+            }
+        });
+
+        // Close cart drawer when clicking outside
+        document.addEventListener('click', function(e) {
+            const drawer = document.getElementById('cartDrawer');
+            const cartLink = document.querySelector('.navbar-cart-link');
+            
+            // Only close if clicking outside the drawer and cart link
+            if (drawer && !drawer.contains(e.target) && !cartLink.contains(e.target)) {
+                drawer.classList.remove('open');
+            }
+        });
+
+        // Close cart drawer when clicking close button
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.cart-close-btn')) {
+                const drawer = document.getElementById('cartDrawer');
+                if (drawer) {
+                    drawer.classList.remove('open');
+                }
+            }
+        });
     </script>
     
     @yield('extra-js')
