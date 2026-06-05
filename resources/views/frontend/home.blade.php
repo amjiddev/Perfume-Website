@@ -588,35 +588,6 @@
             }
         }
 
-        /* Cart Notification */
-        .cart-notification {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #00aa00;
-            color: #ffffff;
-            padding: 1rem 1.5rem;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            font-weight: 600;
-            z-index: 9999;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 170, 0, 0.3);
-        }
-
-        .cart-notification.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .cart-notification i {
-            font-size: 1.2rem;
-        }
-
         /* Swiper Styles */
         .swiper {
             padding: 2rem 0;

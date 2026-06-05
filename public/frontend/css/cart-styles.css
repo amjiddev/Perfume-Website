@@ -1,0 +1,166 @@
+/**
+ * Cart Styles - Professional Add to Cart Button Styles
+ */
+
+/* Cart Notification */
+.cart-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #00aa00;
+    color: #ffffff;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    z-index: 99999;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    min-width: 280px;
+    max-width: 400px;
+}
+
+.cart-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.cart-notification i {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.cart-notification-error {
+    background-color: #ff4444;
+    box-shadow: 0 8px 25px rgba(255, 68, 68, 0.3);
+}
+
+.cart-notification-success {
+    background-color: #00aa00;
+    box-shadow: 0 8px 25px rgba(0, 170, 0, 0.3);
+}
+
+/* Add to Cart Button States */
+.add-to-cart-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.add-to-cart-btn.added-to-cart {
+    background-color: #00aa00 !important;
+    border-color: #00aa00 !important;
+    transform: scale(1.05);
+}
+
+.add-to-cart-btn i {
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn.added-to-cart i {
+    animation: checkBounce 0.5s ease;
+}
+
+@keyframes checkBounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+}
+
+/* Loading Spinner Animation */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ripple Effect on Click */
+.add-to-cart-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.add-to-cart-btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .cart-notification {
+        bottom: 80px;
+        left: 20px;
+        right: 20px;
+        min-width: auto;
+        max-width: none;
+        font-size: 0.9rem;
+        padding: 0.9rem 1.2rem;
+    }
+
+    .cart-notification i {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-notification {
+        bottom: 70px;
+        left: 10px;
+        right: 10px;
+        padding: 0.8rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Add to Cart Button Hover Effects */
+.btn-shop-now-perfume.add-to-cart-btn:hover:not(:disabled),
+.btn-primary-custom.add-to-cart-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Success Pulse Animation */
+@keyframes successPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 170, 0, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(0, 170, 0, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 170, 0, 0);
+    }
+}
+
+.add-to-cart-btn.added-to-cart {
+    animation: successPulse 0.6s;
+}
