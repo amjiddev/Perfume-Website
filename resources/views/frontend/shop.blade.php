@@ -55,10 +55,10 @@
                             <p class="text-muted">{{ $product->description ?? 'Premium quality perfume' }}</p>
                             <div class="rating mb-2">
                                 @for($i = 0; $i < floor($product->rating); $i++)
-                                    <i class="fas fa-star" style="color: #000000;"></i>
+                                    <i class="fas fa-star" style="color: #FFD700;"></i>
                                 @endfor
                                 @if($product->rating % 1 != 0)
-                                    <i class="fas fa-star-half" style="color: #000000;"></i>
+                                    <i class="fas fa-star-half" style="color: #FFD700;"></i>
                                 @endif
                                 <span class="ms-2">({{ $product->reviews_count }} reviews)</span>
                             </div>
@@ -151,7 +151,7 @@
 
         .rating {
             font-size: 0.9rem;
-            color: #000000;
+            color: #FFD700;
         }
 
         .price-section {

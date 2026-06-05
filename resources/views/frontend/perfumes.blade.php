@@ -44,7 +44,6 @@
                                 @if($perfume['discount'])
                                     <span class="sale-badge">{{ $perfume['discount'] }}</span>
                                 @endif
-                                <button class="wishlist-btn-perfume" title="Add to Wishlist"><i class="far fa-heart"></i></button>
                             </div>
                             <div class="product-info">
                                 <h5>{{ $perfume['name'] }}</h5>
@@ -349,7 +348,7 @@
         }
 
         .rating-perfume {
-            color: #000000;
+            color: #FFD700;
             font-size: 0.9rem;
             margin-bottom: 1rem;
         }

@@ -1,12 +1,11 @@
 <x-default-layout>
 <div class="container-fluid dashboard-container">
-    <!-- Header with Notifications -->
-    <div class="dashboard-header">
-        <div class="header-left">
-            <h1>Dashboard</h1>
-            <p class="subtitle">Welcome to Perfume Store Admin Panel</p>
+    <!-- Dashboard Navbar -->
+    <div class="dashboard-navbar">
+        <div class="navbar-left">
+            <h2 class="navbar-title">Dashboard</h2>
         </div>
-        <div class="header-right">
+        <div class="navbar-right">
             <div class="notification-icon-wrapper">
                 <button class="notification-btn" id="notificationBtn">
                     <i class="fas fa-bell"></i>
@@ -42,15 +41,27 @@
             <!-- Profile Icon with Dropdown -->
             <div class="profile-icon-wrapper">
                 <button class="profile-btn" id="profileBtn" data-bs-toggle="dropdown" aria-expanded="false" title="Profile">
-                    <span class="profile-initial">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                    @if(Auth::user()->profile_photo_path)
+                        <img src="{{ asset(Auth::user()->profile_photo_path) }}" alt="Profile" class="profile-img">
+                    @else
+                        <span class="profile-initial">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                    @endif
                 </button>
                 <div class="dropdown-menu dropdown-menu-end profile-dropdown" id="profileDropdown">
-                    <div class="dropdown-header fw-bold">
-                        {{ Auth::user()->name ?? 'Admin' }}
+                    <div class="dropdown-header fw-bold d-flex align-items-center gap-2">
+                        @if(Auth::user()->profile_photo_path)
+                            <img src="{{ asset(Auth::user()->profile_photo_path) }}" alt="Profile" class="profile-dropdown-img">
+                        @else
+                            <div class="profile-dropdown-initial">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                        @endif
+                        <span>{{ Auth::user()->name ?? 'Admin' }}</span>
                     </div>
                     <hr class="dropdown-divider">
                     <a class="dropdown-item" href="javascript:void(0)" onclick="openProfileModal()">
                         <i class="fas fa-user me-2"></i> My Profile
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick="openChangePasswordModal()">
+                        <i class="fas fa-lock me-2"></i> Change Password
                     </a>
                     <hr class="dropdown-divider">
                     <a class="dropdown-item text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -256,6 +267,85 @@
     </div>
 </div>
 
+<!-- Profile Edit Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title" id="profileModalLabel" style="margin: 0;">Edit Profile</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="profileEditForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <!-- Profile Image Section -->
+                    <div class="mb-4 text-center">
+                        <div class="profile-image-wrapper mb-3">
+                            @if(Auth::user()->profile_photo_path)
+                                <img id="profilePreview" src="{{ asset(Auth::user()->profile_photo_path) }}" alt="Profile" class="profile-preview-img">
+                            @else
+                                <div id="profilePreview" class="profile-preview-initial">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                            @endif
+                        </div>
+                        <input type="file" id="profileImageInput" name="profile_photo_path" class="form-control" accept="image/*">
+                        <small class="text-muted">Choose a profile image (optional)</small>
+                    </div>
+
+                    <!-- Name Field -->
+                    <div class="mb-3">
+                        <label for="nameInput" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="nameInput" name="name" value="{{ Auth::user()->name }}" required>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="emailInput" name="email" value="{{ Auth::user()->email }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">Update Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title" id="changePasswordLabel" style="margin: 0;">Change Password</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="changePasswordForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="password_confirmation" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <style>
     * {
         margin: 0;
@@ -275,16 +365,43 @@
         margin: 0 auto;
     }
 
-    /* Header */
-    .dashboard-header {
+    /* Navbar */
+    .dashboard-navbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 3rem;
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem 2rem;
+        border-radius: 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        margin-bottom: 2rem;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .navbar-left {
+        flex: 1;
+    }
+
+    .navbar-title {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        justify-content: flex-end;
+    }
+
+    /* Old Header - kept for reference but hidden */
+    .dashboard-header {
+        display: none;
     }
 
     .header-left {
@@ -848,6 +965,38 @@
         to {
             width: 0;
         }
+    }
+
+    /* Profile Modal Styles */
+    .profile-image-wrapper {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 3px solid #f0f0f0;
+    }
+
+    .profile-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .profile-preview-initial {
+        font-size: 3rem;
+        font-weight: 700;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
     }
 
     /* Responsive */
@@ -1567,6 +1716,87 @@
         const modal = new bootstrap.Modal(document.getElementById('profileModal'));
         modal.show();
     }
+
+    // Profile Modal Functions
+    function openProfileModal() {
+        const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+        modal.show();
+    }
+
+    function openChangePasswordModal() {
+        const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+        modal.show();
+    }
+
+    // Profile image preview
+    document.getElementById('profileImageInput')?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const preview = document.getElementById('profilePreview');
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                img.className = 'profile-preview-img';
+                preview.innerHTML = '';
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Profile form submission
+    document.getElementById('profileEditForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/admin/profile/update', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Profile updated successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to update profile'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating profile');
+        });
+    });
+
+    // Change password form submission
+    document.getElementById('changePasswordForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/admin/password/update', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Password changed successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+                document.getElementById('changePasswordForm').reset();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to change password'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error changing password');
+        });
+    });
 </script>
 
 </x-default-layout>
