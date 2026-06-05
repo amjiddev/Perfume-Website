@@ -52,7 +52,7 @@
                                     <p class="price-perfume">Rs {{ number_format($perfume->original_price) }}</p>
                                 </div>
                             @endif
-                            <a href="#" class="btn-view-details-perfume">View Details</a>
+                            <a href="{{ route('product.detail', $perfume->id) }}" class="btn-view-details-perfume">View Details</a>
                         </div>
                     </div>
                 @empty
@@ -81,40 +81,48 @@
                 <h2 class="section-title">{{ $perfumePage->best_sellers_title ?? 'Best Selling Perfumes' }}</h2>
                 
                 <div class="row">
-                    @foreach($bestSellers->take(3) as $perfume)
-                        <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="best-seller-card-perfume">
-                                <div class="best-seller-image">
-                                    <img src="{{ asset($perfume->image ?? 'https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?w=300&h=400&fit=crop') }}" alt="{{ $perfume->name }} - Best Selling" loading="lazy">
-                                </div>
-                                <div class="best-seller-content">
-                                    <h5>{{ $perfume->name }}</h5>
-                                    <div class="rating-perfume">
-                                        @for($i = 0; $i < floor($perfume->rating); $i++)
-                                            <i class="fas fa-star"></i>
-                                        @endfor
-                                        @if($perfume->rating % 1 != 0)
-                                            <i class="fas fa-star-half-alt"></i>
-                                        @endif
-                                        <span>({{ $perfume->reviews_count }} reviews)</span>
-                                    </div>
-                                    @if($perfume->price)
-                                        <p class="price-perfume">Rs {{ number_format($perfume->price) }}</p>
-                                    @elseif($perfume->original_price)
-                                        <p class="price-perfume">Rs {{ number_format($perfume->original_price) }}</p>
+                @foreach($bestSellers->take(3) as $perfume)
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="best-seller-card-perfume">
+                            <div class="best-seller-image">
+                                <a href="{{ route('product.detail', $perfume->id) }}" class="product-image-link">
+                                    <img src="{{ asset($perfume->image ?? 'frontend/images/perfume1.jpg') }}" alt="{{ $perfume->name }} - Best Selling Perfume" loading="lazy">
+                                </a>
+                                @if($perfume->discount_percentage)
+                                    <span class="sale-badge">-{{ $perfume->discount_percentage }}%</span>
+                                @endif
+                            </div>
+                            <div class="best-seller-content">
+                                <h5>{{ $perfume->name }}</h5>
+                                <div class="rating-perfume">
+                                    @for($i = 0; $i < floor($perfume->rating); $i++)
+                                        <i class="fas fa-star"></i>
+                                    @endfor
+                                    @if($perfume->rating % 1 != 0)
+                                        <i class="fas fa-star-half-alt"></i>
                                     @endif
-                                    <button class="btn-shop-now-perfume add-to-cart-btn" 
-                                            data-product-id="{{ $perfume->id }}" 
-                                            data-product-name="{{ $perfume->name }}" 
-                                            data-product-price="{{ $perfume->price ?? $perfume->original_price ?? 0 }}" 
-                                            data-product-image="{{ asset($perfume->image ?? 'https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?w=300&h=400&fit=crop') }}">
-                                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                                    </button>
+                                    <span>({{ $perfume->reviews_count }} reviews)</span>
                                 </div>
+                                @if($perfume->price)
+                                    <p class="price-perfume">Rs {{ number_format($perfume->price) }}</p>
+                                    @if($perfume->original_price)
+                                        <p class="original-price-perfume"><s>Rs {{ number_format($perfume->original_price) }}</s></p>
+                                    @endif
+                                @elseif($perfume->original_price)
+                                    <p class="price-perfume">Rs {{ number_format($perfume->original_price) }}</p>
+                                @endif
+                                <button class="btn-shop-now-perfume add-to-cart-btn" 
+                                        data-product-id="{{ $perfume->id }}" 
+                                        data-product-name="{{ $perfume->name }}" 
+                                        data-product-price="{{ $perfume->price ?? $perfume->original_price ?? 0 }}" 
+                                        data-product-image="{{ asset($perfume->image) }}">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
                             </div>
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
+            </div>
             </div>
         </section>
     @endif

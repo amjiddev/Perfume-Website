@@ -27,10 +27,14 @@
                         </div>
 
                         <div class="product-price-section">
-                            <div class="product-price">Rs {{ number_format($product['price'] ?? 0) }}</div>
-                            @if (($product['discount_percentage'] ?? 0) > 0)
-                                <div class="product-original-price"><s>Rs {{ number_format($product['original_price'] ?? 0) }}</s></div>
-                                <span class="discount-badge">{{ $product['discount_percentage'] }}% OFF</span>
+                            @if (($product['price'] ?? 0) > 0)
+                                <div class="product-price">Rs {{ number_format($product['price']) }}</div>
+                                @if (($product['discount_percentage'] ?? 0) > 0)
+                                    <div class="product-original-price"><s>Rs {{ number_format($product['original_price'] ?? 0) }}</s></div>
+                                    <span class="discount-badge">{{ $product['discount_percentage'] }}% OFF</span>
+                                @endif
+                            @else
+                                <div class="product-price">Rs {{ number_format($product['original_price'] ?? 0) }}</div>
                             @endif
                         </div>
 
@@ -142,9 +146,13 @@
                             <p class="product-description">{{ $relatedProduct['description'] ?? '' }}</p>
                             <div class="product-footer">
                                 <div class="price-section">
-                                    <p class="price">Rs {{ number_format($relatedProduct['price'] ?? 0) }}</p>
-                                    @if($relatedProduct['original_price'] ?? 0)
-                                        <p class="original-price"><s>Rs {{ number_format($relatedProduct['original_price']) }}</s></p>
+                                    @if (($relatedProduct['price'] ?? 0) > 0)
+                                        <p class="price">Rs {{ number_format($relatedProduct['price']) }}</p>
+                                        @if($relatedProduct['original_price'] ?? 0)
+                                            <p class="original-price"><s>Rs {{ number_format($relatedProduct['original_price']) }}</s></p>
+                                        @endif
+                                    @else
+                                        <p class="price">Rs {{ number_format($relatedProduct['original_price'] ?? 0) }}</p>
                                     @endif
                                 </div>
                                 <a href="{{ route('product.detail', $relatedProduct['id']) }}" class="btn-view-details">View Details</a>

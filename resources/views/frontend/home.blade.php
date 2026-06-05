@@ -197,7 +197,7 @@
                     <div class="trust-badge">
                         <i class="fas fa-truck"></i>
                         <h5>Free Shipping</h5>
-                        <p>On orders above Rs 2,000</p>
+                        <p>On orders above Rs 4,000</p>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 mb-4">
@@ -211,7 +211,7 @@
                     <div class="trust-badge">
                         <i class="fas fa-undo"></i>
                         <h5>Easy Returns</h5>
-                        <p>30-day return policy</p>
+                        <p>15-day return policy</p>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4">
-                    <img src="{{ asset($homePage->about_image ?? 'frontend/images/perfume5.jfif') }}" alt="Almukhtar Perfume - Luxury Brand" class="img-fluid" loading="lazy">
+                    <img src="{{ asset($homePage->about_image ?? 'frontend/images/perfume5.jfif') }}" alt="Almukhtar Perfume - Luxury Brand" class="img-fluid about-image" loading="lazy" style="width: 100%; height: auto; max-height: 400px; object-fit: cover;">
                 </div>
                 <div class="col-lg-6">
                     <p class="collection-label">ABOUT US</p>
@@ -272,6 +272,18 @@
     </section>
 
     <style>
+        /* About Section Image Styles */
+        .about-brand-section {
+            overflow: visible;
+        }
+
+        .about-image {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 400px !important;
+            display: block !important;
+        }
+
         .btn-subscribe:hover {
             background-color: #333333;
             transform: translateY(-2px);
@@ -635,6 +647,10 @@
         }
 
         /* Guest Gift Modal Styles */
+        .guest-gift-modal-dialog {
+            max-width: 600px;
+        }
+
         .guest-gift-modal-content {
             border: none;
             border-radius: 8px;
@@ -670,11 +686,12 @@
 
         .guest-gift-modal-image {
             width: 100%;
-            height: auto;
+            height: 400px;
             display: block;
             border-radius: 0;
             box-shadow: none;
             transition: transform 0.3s ease;
+            object-fit: cover;
         }
 
         .guest-gift-modal-image:hover {
@@ -701,7 +718,14 @@
                 top: 8px;
                 right: 8px;
             }
-        }
+
+            .guest-gift-modal-dialog {
+                max-width: 90%;
+            }
+
+            .guest-gift-modal-image {
+                height: 300px;
+            }
 
             .guest-gift-modal-image {
                 max-width: 100%;
@@ -880,32 +904,50 @@
         }
 
         // Initialize Add to Cart Button Listeners
+        // Initialize Add to Cart Button Listeners  
+        let addToCartListenerAttached = false;
+        
         function initializeAddToCartButtons() {
-            const buttons = document.querySelectorAll('.add-to-cart-btn');
-            console.log('Found', buttons.length, 'add to cart buttons');
+            // Only attach listener once using event delegation
+            if (addToCartListenerAttached) {
+                return;
+            }
             
-            buttons.forEach((button, index) => {
-                // Skip if already initialized
-                if (button.hasAttribute('data-listener-attached')) {
+            addToCartListenerAttached = true;
+            
+            document.addEventListener('click', function(e) {
+                const button = e.target.closest('.add-to-cart-btn');
+                if (!button) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Prevent double-click by disabling button temporarily
+                if (button.hasAttribute('data-adding-to-cart')) {
+                    console.log('Button already processing, ignoring click');
                     return;
                 }
                 
-                button.setAttribute('data-listener-attached', 'true');
+                button.setAttribute('data-adding-to-cart', 'true');
+                button.disabled = true;
                 
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const productId = this.getAttribute('data-product-id');
-                    const productName = this.getAttribute('data-product-name');
-                    const productPrice = this.getAttribute('data-product-price');
-                    const productImage = this.getAttribute('data-product-image');
-                    
-                    console.log(`Button ${index} clicked:`, { productId, productName, productPrice, productImage });
-                    
-                    addToCart(productId, productName, productPrice, productImage);
-                });
-            });
+                const productId = button.getAttribute('data-product-id');
+                const productName = button.getAttribute('data-product-name');
+                const productPrice = button.getAttribute('data-product-price');
+                const productImage = button.getAttribute('data-product-image');
+                
+                console.log('Add to cart clicked:', { productId, productName, productPrice, productImage });
+                
+                addToCart(productId, productName, productPrice, productImage);
+                
+                // Re-enable button after 1.5 seconds
+                setTimeout(() => {
+                    button.removeAttribute('data-adding-to-cart');
+                    button.disabled = false;
+                }, 1500);
+            }, true);
+            
+            console.log('Add to cart event listener attached (using event delegation)');
         }
 
         // Initialize on DOM ready
@@ -917,13 +959,6 @@
             // DOM already loaded
             setTimeout(initializeAddToCartButtons, 100);
         }
-
-        // Also reinitialize when page content updates or tabs switch
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                setTimeout(initializeAddToCartButtons, 100);
-            }
-        });
 
         // Show notification
         function showNotification(message) {
@@ -1036,7 +1071,7 @@
 
     <!-- Guest Gift Modal -->
     <div class="modal fade" id="guestGiftModal" tabindex="-1" aria-labelledby="guestGiftModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered guest-gift-modal-dialog">
             <div class="modal-content guest-gift-modal-content">
                 <button type="button" class="btn-close btn-close-white guest-gift-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body guest-gift-modal-body">

@@ -27,8 +27,9 @@ class DashboardController extends Controller
         // Get email subscriptions
         $emailSubscriptions = EmailSubscription::orderBy('created_at', 'desc')->get();
         
-        // Get notifications (orders awaiting approval)
+        // Get notifications (unviewed pending orders)
         $notifications = Order::where('status', 'pending')
+            ->where('viewed', false)
             ->orderBy('created_at', 'desc')
             ->get();
         

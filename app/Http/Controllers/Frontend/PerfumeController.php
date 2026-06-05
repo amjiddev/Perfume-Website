@@ -90,6 +90,10 @@ class PerfumeController extends Controller
                 'product' => (object)$productData,
                 'relatedProducts' => array_map(function($p) { return (object)$p; }, Products::getRelated($id))
             ]);
+            return view('frontend.perfume-detail', [
+            'product' => $product,
+            'relatedProducts' => $relatedProducts
+        ]);
         }
         
         // Convert Perfume model to array-like structure for view compatibility
@@ -124,6 +128,10 @@ class PerfumeController extends Controller
             ->toArray();
         
         return view('frontend.product-detail', [
+            'product' => $product,
+            'relatedProducts' => $relatedProducts
+        ]);
+        return view('frontend.perfume-detail', [
             'product' => $product,
             'relatedProducts' => $relatedProducts
         ]);

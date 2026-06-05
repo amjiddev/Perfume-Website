@@ -84,6 +84,25 @@ class OrderController extends Controller
         }
     }
 
+    public function markAsViewed($orderId)
+    {
+        try {
+            $order = Order::findOrFail($orderId);
+            $order->update(['viewed' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification marked as viewed'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark notification as viewed'
+            ], 500);
+        }
+    }
+
     public function getStatusCounts(Request $request)
     {
         try {

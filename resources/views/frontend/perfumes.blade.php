@@ -64,7 +64,7 @@
                                         <p class="original-price-perfume"><s>Rs {{ number_format($perfume['original']) }}</s></p>
                                     @endif
                                 </div>
-                                <a href="#" class="btn-view-details-perfume">View Details</a>
+                                <a href="{{ route('product.detail', $index) }}" class="btn-view-details-perfume">View Details</a>
                             </div>
                         </div>
                         @endforeach
@@ -104,7 +104,7 @@
                                 <span>(185 reviews)</span>
                             </div>
                             <p class="price-perfume">Rs 51,530</p>
-                            <a href="#" class="btn-shop-now-perfume">Shop Now</a>
+                            <a href="{{ route('product.detail', 0) }}" class="btn-shop-now-perfume">Shop Now</a>
                         </div>
                     </div>
                 </div>
@@ -125,7 +125,7 @@
                                 <span>(210 reviews)</span>
                             </div>
                             <p class="price-perfume">Rs 58,380</p>
-                            <a href="#" class="btn-shop-now-perfume">Shop Now</a>
+                            <a href="{{ route('product.detail', 1) }}" class="btn-shop-now-perfume">Shop Now</a>
                         </div>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
                                 <span>(220 reviews)</span>
                             </div>
                             <p class="price-perfume">Rs 61,160</p>
-                            <a href="#" class="btn-shop-now-perfume">Shop Now</a>
+                            <a href="{{ route('product.detail', 4) }}" class="btn-shop-now-perfume">Shop Now</a>
                         </div>
                     </div>
                 </div>
@@ -663,3 +663,5 @@
         }
     </script>
 @endsection
+
+

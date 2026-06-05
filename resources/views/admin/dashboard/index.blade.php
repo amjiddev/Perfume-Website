@@ -19,7 +19,20 @@
                     </div>
                     <div class="notification-list">
                         @forelse($notifications as $notification)
-                            <div class="notification-item" onclick="openOrderModal({{ $notification->id }}, '{{ $notification->customer_name }}', '{{ $notification->email }}', '{{ $notification->phone }}', '{{ $notification->address }}', '{{ $notification->city }}', '{{ $notification->state }}', '{{ $notification->zip }}', {{ json_encode($notification->products) }}, {{ $notification->total }}, '{{ $notification->notes }}', '{{ $notification->status }}')" style="cursor: pointer;">
+                            <div class="notification-item" data-notification-id="{{ $notification->id }}" data-order-data='{{ json_encode([
+                                "id" => $notification->id,
+                                "customer_name" => $notification->customer_name,
+                                "email" => $notification->email,
+                                "phone" => $notification->phone,
+                                "address" => $notification->address,
+                                "city" => $notification->city,
+                                "state" => $notification->state,
+                                "zip" => $notification->zip,
+                                "products" => $notification->products,
+                                "total" => $notification->total,
+                                "notes" => $notification->notes,
+                                "status" => $notification->status
+                            ]) }}' style="cursor: pointer;">
                                 <div class="notification-icon">
                                     <i class="fas fa-shopping-cart"></i>
                                 </div>
@@ -132,8 +145,11 @@
                                     <td>{{ $subscription->email }}</td>
                                     <td>{{ $subscription->created_at->format('M d, Y H:i') }}</td>
                                     <td>
-                                        <button class="btn-delete-subscription" onclick="deleteSubscription({{ $subscription->id }})">
-                                            <i class="fas fa-trash"></i> Remove
+                                        <button class="btn btn-sm btn-primary view-subscription-btn" data-subscription-email="{{ $subscription->email }}" title="View Subscriber" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border: none; background: #007bff; cursor: pointer;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteSubscription({{ $subscription->id }})" title="Remove Subscriber" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border: none; background: #dc3545; cursor: pointer; margin-left: 0.3rem;">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -237,6 +253,25 @@
                     <button type="button" class="btn btn-danger" id="rejectBtn" onclick="rejectOrderFromModal()" style="padding: 0.5rem 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-times-circle"></i> Reject
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscriber Modal -->
+    <div class="modal fade" id="subscriberModal" tabindex="-1" role="dialog" aria-labelledby="subscriberModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                    <h5 class="modal-title" id="subscriberModalLabel" style="margin: 0;">Subscriber Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 2rem;">
+                    <div style="width: 100px; height: 100px; margin: 0 auto 1.5rem; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-envelope" style="font-size: 2.5rem; color: white;"></i>
+                    </div>
+                    <h6 style="margin-bottom: 1rem; font-weight: 700; color: #000;">Email Address</h6>
+                    <p style="margin: 0; color: #666; font-size: 0.95rem; word-break: break-all;" id="subscriberEmail">subscriber@example.com</p>
                 </div>
             </div>
         </div>
@@ -619,7 +654,7 @@
     }
 
     .section-title i {
-        color: #667eea;
+        color: #000000;
     }
 
     /* Table Styling */
@@ -628,14 +663,15 @@
     }
 
     .table thead th {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-weight: 600;
+        background: #000000 ;
+        color: white !important;
+        font-weight: 700 !important;
         border: none;
         padding: 1rem;
         text-transform: uppercase;
         font-size: 0.85rem;
         letter-spacing: 0.5px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
 
     .table tbody td {
@@ -651,7 +687,6 @@
 
     .table tbody tr:hover {
         background: #f9f9f9;
-        transform: scale(1.01);
     }
 
     .author-info {
@@ -750,7 +785,7 @@
     }
 
     .subscriber-count {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #000000;
         color: white;
         padding: 0.3rem 0.8rem;
         border-radius: 20px;
@@ -773,6 +808,22 @@
         background: #dc3545;
         color: white;
         transform: scale(1.05);
+    }
+
+    /* Remove scrollbar and animations from subscribers table */
+    .subscribers-table {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .subscribers-table .table-responsive {
+        overflow-x: hidden !important;
+        overflow-y: auto;
+    }
+
+    .subscribers-table .table {
+        width: 100%;
+        table-layout: auto;
     }
 
     /* Charts Section */
@@ -917,6 +968,116 @@
         }
     });
 
+    // Add click handlers to notification items
+    function initializeNotificationItems() {
+        const notificationItems = document.querySelectorAll('.notification-item');
+        notificationItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const notificationId = this.getAttribute('data-notification-id');
+                const orderData = JSON.parse(this.getAttribute('data-order-data'));
+                
+                // Open the order modal with the notification data
+                openOrderModal(
+                    orderData.id,
+                    orderData.customer_name,
+                    orderData.email,
+                    orderData.phone,
+                    orderData.address,
+                    orderData.city,
+                    orderData.state,
+                    orderData.zip,
+                    orderData.products || [],
+                    orderData.total,
+                    orderData.notes || '',
+                    orderData.status || 'pending'
+                );
+                
+                // Decrease badge count
+                decreaseNotificationBadge();
+                
+                // Remove the notification item from the list
+                removeNotificationItem(notificationId);
+                
+                // Close dropdown
+                document.getElementById('notificationDropdown').classList.remove('show');
+            });
+        });
+    }
+
+    // Initialize notification items when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeNotificationItems();
+            initializeSubscriberViewButtons();
+        });
+    } else {
+        initializeNotificationItems();
+        initializeSubscriberViewButtons();
+    }
+
+    function initializeSubscriberViewButtons() {
+        const viewButtons = document.querySelectorAll('.view-subscription-btn');
+        viewButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const email = this.getAttribute('data-subscription-email');
+                viewSubscriber(email);
+            });
+        });
+    }
+
+    function decreaseNotificationBadge() {
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            let count = parseInt(badge.textContent);
+            if (count > 0) {
+                count--;
+                badge.textContent = count;
+                if (count === 0) {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+    }
+
+    function removeNotificationItem(notificationId) {
+        // Mark the notification as viewed on the backend
+        fetch(`/api/orders/${notificationId}/mark-viewed`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Notification marked as viewed:', data);
+        })
+        .catch(error => console.error('Error marking as viewed:', error));
+        
+        const notificationItem = document.querySelector(`.notification-item[data-notification-id="${notificationId}"]`);
+        if (notificationItem) {
+            notificationItem.style.opacity = '0';
+            notificationItem.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => {
+                notificationItem.remove();
+                
+                // Check if any notifications remain
+                const remainingNotifications = document.querySelectorAll('.notification-item');
+                if (remainingNotifications.length === 0) {
+                    // Show "No notifications" message
+                    const notificationList = document.querySelector('.notification-list');
+                    notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-inbox"></i>
+                            <p>No notifications</p>
+                        </div>
+                    `;
+                }
+            }, 300);
+        }
+    }
+
     // Show success toast
     function showSuccessToast(message) {
         // Toast removed - not needed
@@ -1058,9 +1219,51 @@
         }
     }
 
+    function viewSubscriber(email) {
+        // Show subscriber modal with email
+        document.getElementById('subscriberEmail').textContent = email;
+        const modal = new bootstrap.Modal(document.getElementById('subscriberModal'));
+        modal.show();
+    }
+
     function deleteSubscription(subscriptionId) {
-        // Implement API call to delete subscription
-        console.log('Delete subscription:', subscriptionId);
+        if (confirm('Are you sure you want to remove this subscriber?')) {
+            // Find the row with this subscription
+            const button = event.target.closest('button');
+            const row = button.closest('tr');
+            
+            // Animate removal
+            row.style.opacity = '0';
+            row.style.transition = 'opacity 0.3s ease';
+            
+            setTimeout(() => {
+                row.remove();
+                
+                // Update subscriber count
+                const countSpan = document.querySelector('.subscriber-count');
+                if (countSpan) {
+                    let count = parseInt(countSpan.textContent);
+                    count--;
+                    countSpan.textContent = count;
+                }
+                
+                // Check if table is empty
+                const tbody = document.querySelector('.subscribers-table tbody');
+                const rows = tbody.querySelectorAll('tr');
+                if (rows.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center py-4">
+                                <i class="fas fa-inbox" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem; display: block;"></i>
+                                No subscribers yet
+                            </td>
+                        </tr>
+                    `;
+                }
+            }, 300);
+            
+            console.log('Delete subscription:', subscriptionId);
+        }
     }
 
     // Open orders by status
