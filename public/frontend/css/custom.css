@@ -2680,3 +2680,62 @@ footer ul li a {
 /* ========================================
    RESPONSIVE SHOP TABS - END
    ======================================== */
+
+/* ========================================
+   FLOATING WHATSAPP BUTTON - START
+   ======================================== */
+
+.floating-whatsapp-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #25d366;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1500;
+    text-decoration: none;
+    border: none;
+}
+
+.floating-whatsapp-btn:hover {
+    background-color: #1ebd56;
+    transform: scale(1.1) translateY(-5px);
+    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+}
+
+.floating-whatsapp-btn:active {
+    transform: scale(0.95);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .floating-whatsapp-btn {
+        width: 55px;
+        height: 55px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-whatsapp-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 15px;
+        right: 15px;
+        font-size: 1.4rem;
+    }
+}
+
+/* ========================================
+   FLOATING WHATSAPP BUTTON - END
+   ======================================== */

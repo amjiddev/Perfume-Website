@@ -166,7 +166,7 @@
                                 <button class="btn-shop-now-perfume add-to-cart-btn" 
                                         data-product-id="{{ $perfume->id }}" 
                                         data-product-name="{{ $perfume->name }}" 
-                                        data-product-price="{{ $perfume->price ?? 0 }}" 
+                                        data-product-price="{{ $perfume->price ?? $perfume->original_price ?? 0 }}" 
                                         data-product-image="{{ asset($perfume->image) }}">
                                     <i class="fas fa-shopping-cart"></i> Add to Cart
                                 </button>
@@ -263,8 +263,8 @@
             <div class="newsletter-content">
                 <h2>Subscribe & Get 10% Off</h2>
                 <p>Join our exclusive community and receive special offers on luxury perfumes</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Enter your email" required>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
                     <button type="submit" class="btn-subscribe">Subscribe</button>
                 </form>
             </div>
@@ -891,28 +891,67 @@
             };
 
             // Check if cart manager is available
-            if (typeof cartManager === 'undefined') {
+            if (typeof cartManager === 'undefined' || !cartManager) {
                 console.error('Cart manager not available');
                 alert('Error: Cart system not loaded. Please refresh the page.');
                 return;
             }
 
-            cartManager.addItem(product);
-            showNotification('Added to cart!');
+            // Add item to cart
+            try {
+                cartManager.addItem(product);
+                showNotification('Added to cart!');
+                console.log('Product added to cart:', product);
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error adding to cart. Please try again.');
+            }
         }
 
-        // Event listeners for add to cart buttons using data attributes
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.addEventListener('click', function() {
+        // Initialize Add to Cart Button Listeners
+        function initializeAddToCartButtons() {
+            const buttons = document.querySelectorAll('.add-to-cart-btn');
+            console.log('Found', buttons.length, 'add to cart buttons');
+            
+            buttons.forEach((button, index) => {
+                // Skip if already initialized
+                if (button.hasAttribute('data-listener-attached')) {
+                    return;
+                }
+                
+                button.setAttribute('data-listener-attached', 'true');
+                
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
                     const productId = this.getAttribute('data-product-id');
                     const productName = this.getAttribute('data-product-name');
                     const productPrice = this.getAttribute('data-product-price');
                     const productImage = this.getAttribute('data-product-image');
                     
+                    console.log(`Button ${index} clicked:`, { productId, productName, productPrice, productImage });
+                    
                     addToCart(productId, productName, productPrice, productImage);
                 });
             });
+        }
+
+        // Initialize on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initializeAddToCartButtons, 100);
+            });
+        } else {
+            // DOM already loaded
+            setTimeout(initializeAddToCartButtons, 100);
+        }
+
+        // Also reinitialize when page content updates or tabs switch
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                setTimeout(initializeAddToCartButtons, 100);
+            }
         });
 
         // Show notification
@@ -1147,6 +1186,38 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('orderModal'));
             modal.hide();
         }
+    </script>
+
+    <!-- Newsletter Subscription Script -->
+    <script>
+        document.getElementById('newsletterForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('newsletterEmail').value;
+            
+            try {
+                const response = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Thank you for subscribing! Check your email for 10% off coupon.');
+                    document.getElementById('newsletterForm').reset();
+                } else {
+                    alert(data.message || 'Subscription failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
     </script>
 
 @endsection

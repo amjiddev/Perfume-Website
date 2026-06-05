@@ -195,20 +195,40 @@
 
         function goToCheckout() {
             @if($product)
-                // Add product to cart instead of going to checkout
+                // Validate product data
+                const productId = {{ $product['id'] ?? 'null' }};
+                const productName = '{{ $product['name'] ?? 'Product' }}';
+                const productPrice = {{ $product['price'] ?? $product['original_price'] ?? 0 }};
+                const productImage = '{{ asset($product['image'] ?? 'frontend/images/perfume1.jpg') }}';
+                const quantity = parseInt(document.getElementById('detailQuantity').value);
+
+                if (!productId || productPrice <= 0) {
+                    alert('Error: Invalid product information');
+                    return;
+                }
+
                 const product = {
-                    id: {{ $product['id'] ?? 'null' }},
-                    name: '{{ $product['name'] ?? 'Product' }}',
-                    price: {{ $product['price'] ?? 0 }},
-                    image: '{{ asset($product['image'] ?? 'frontend/images/perfume1.jpg') }}',
-                    quantity: parseInt(document.getElementById('detailQuantity').value)
+                    id: productId,
+                    name: productName.trim(),
+                    price: parseFloat(productPrice),
+                    image: productImage,
+                    quantity: quantity
                 };
                 
-                if (typeof cartManager !== 'undefined') {
+                // Check cart manager
+                if (typeof cartManager === 'undefined' || !cartManager) {
+                    console.error('Cart manager not available');
+                    alert('Error: Cart system not loaded. Please refresh the page.');
+                    return;
+                }
+
+                try {
                     cartManager.addItem(product);
                     showNotification('Added to cart!');
-                } else {
-                    console.error('Cart manager not available');
+                    console.log('Product added:', product);
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+                    alert('Error adding to cart. Please try again.');
                 }
             @else
                 alert('Product not found');
