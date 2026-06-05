@@ -166,7 +166,7 @@
                                 <button class="btn-shop-now-perfume add-to-cart-btn" 
                                         data-product-id="{{ $perfume->id }}" 
                                         data-product-name="{{ $perfume->name }}" 
-                                        data-product-price="{{ $perfume->price ?? 0 }}" 
+                                        data-product-price="{{ $perfume->price ?? $perfume->original_price ?? 0 }}" 
                                         data-product-image="{{ asset($perfume->image) }}">
                                     <i class="fas fa-shopping-cart"></i> Add to Cart
                                 </button>
@@ -263,8 +263,8 @@
             <div class="newsletter-content">
                 <h2>Subscribe & Get 10% Off</h2>
                 <p>Join our exclusive community and receive special offers on luxury perfumes</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Enter your email" required>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
                     <button type="submit" class="btn-subscribe">Subscribe</button>
                 </form>
             </div>
@@ -1056,6 +1056,38 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('orderModal'));
             modal.hide();
         }
+    </script>
+
+    <!-- Newsletter Subscription Script -->
+    <script>
+        document.getElementById('newsletterForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('newsletterEmail').value;
+            
+            try {
+                const response = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Thank you for subscribing! Check your email for 10% off coupon.');
+                    document.getElementById('newsletterForm').reset();
+                } else {
+                    alert(data.message || 'Subscription failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
     </script>
 
 @endsection

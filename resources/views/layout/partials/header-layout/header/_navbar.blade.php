@@ -45,7 +45,7 @@
     </div>
     <!--end::Theme mode-->
     <!--begin::User menu-->
-    <div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
+    <div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle" style="display: none;">
         <!--begin::Menu wrapper-->
         <div class="cursor-pointer symbol symbol-30px symbol-md-40px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
             @if(Auth::user()->profile_photo_url)

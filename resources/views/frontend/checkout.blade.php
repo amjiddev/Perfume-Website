@@ -395,9 +395,23 @@
                         return;
                     }
 
+                    // Get total from the summary
+                    const totalElement = document.querySelector('.total-amount span');
+                    let total = 0;
+                    
+                    if (totalElement) {
+                        // Extract numeric value from the text
+                        const totalText = totalElement.textContent;
+                        total = parseFloat(totalText.replace(/[^0-9.]/g, ''));
+                    }
+
+                    if (total <= 0) {
+                        alert('Error: Invalid total amount');
+                        return;
+                    }
+
                     const orderData = {
-                        firstName: document.getElementById('firstName').value,
-                        lastName: document.getElementById('lastName').value,
+                        customer_name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
                         email: document.getElementById('email').value,
                         phone: document.getElementById('phone').value,
                         address: document.getElementById('address').value,
@@ -405,20 +419,48 @@
                         state: document.getElementById('state').value,
                         zip: document.getElementById('zip').value,
                         notes: document.getElementById('notes').value,
-                        items: cartData,
-                        total: document.querySelector('.total-amount span')?.textContent || '0'
+                        products: cartData,
+                        total: total,
+                        status: 'pending'
                     };
 
-                    console.log('Order submitted:', orderData);
-                    alert('Order placed successfully! We will contact you soon to confirm your order.');
-                    
-                    // Clear cart
-                    localStorage.removeItem('perfume_cart');
-                    
-                    // Redirect
-                    setTimeout(() => {
-                        window.location.href = '{{ route("home") }}';
-                    }, 1000);
+                    console.log('Submitting order:', orderData);
+
+                    // Submit order to backend
+                    fetch('/api/orders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        },
+                        body: JSON.stringify(orderData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Order response:', data);
+                        if (data.success) {
+                            alert('Order placed successfully! We will contact you soon to confirm your order.');
+                            
+                            // Clear cart
+                            localStorage.removeItem('perfume_cart');
+                            if (typeof cartManager !== 'undefined') {
+                                cartManager.items = [];
+                                cartManager.saveCart();
+                                cartManager.updateBadge();
+                            }
+                            
+                            // Redirect
+                            setTimeout(() => {
+                                window.location.href = '{{ route("home") }}';
+                            }, 1000);
+                        } else {
+                            alert('Error placing order: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error placing order. Please try again.');
+                    });
                 });
             }
         });

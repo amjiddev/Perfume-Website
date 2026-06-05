@@ -13,6 +13,7 @@ class Review extends Model
         'text',
         'display_section',
         'image',
+        'status',
     ];
 
     protected $casts = [

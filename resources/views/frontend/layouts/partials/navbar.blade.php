@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
-             <img src="{{ asset('frontend/images/logoo.png') }}" alt="Perfumes for Men">
+             <img src="{{ asset('frontend/images/loogo.jpeg') }}" alt="Perfumes for Men">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>

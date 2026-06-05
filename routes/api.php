@@ -108,3 +108,17 @@ Route::prefix('v1')->group(function () {
         return app(SamplePermissionApi::class)->delete($id);
     });
 });
+
+// Subscription Route (public)
+Route::post('/subscribe', [\App\Http\Controllers\Api\SubscriptionController::class, 'subscribe'])->name('api.subscribe');
+
+// Order Store Route (public)
+Route::post('/orders', [\App\Http\Controllers\Api\OrderStoreController::class, 'store'])->name('api.orders.store');
+
+// Order Routes
+Route::post('/orders/{orderId}/approve', [\App\Http\Controllers\Api\OrderController::class, 'approve'])->name('api.orders.approve');
+Route::post('/orders/{orderId}/reject', [\App\Http\Controllers\Api\OrderController::class, 'reject'])->name('api.orders.reject');
+Route::post('/orders/{orderId}/pending', [\App\Http\Controllers\Api\OrderController::class, 'pending'])->name('api.orders.pending');
+Route::delete('/orders/{orderId}', [\App\Http\Controllers\Api\OrderController::class, 'destroy'])->name('api.orders.destroy');
+Route::get('/orders-by-status', [\App\Http\Controllers\Api\OrderController::class, 'getByStatus'])->name('api.orders.by-status');
+Route::get('/status-counts', [\App\Http\Controllers\Api\OrderController::class, 'getStatusCounts'])->name('api.status-counts');
