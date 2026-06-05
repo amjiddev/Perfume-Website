@@ -41,7 +41,6 @@
                                     <span class="sale-badge">{{ $attar['discount'] }}</span>
                                 @endif
                                 <span class="attar-badge">Alcohol-Free</span>
-                                <button class="wishlist-btn-attar" title="Add to Wishlist"><i class="far fa-heart"></i></button>
                             </div>
                             <div class="product-info">
                                 <h5>{{ $attar['name'] }}</h5>
@@ -49,10 +48,10 @@
                                 <p class="product-desc">{{ $attar['desc'] }}</p>
                                 <div class="rating-attar">
                                     @for($i = 0; $i < floor($attar['rating']); $i++)
-                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star" style="color: #FFD700;"></i>
                                     @endfor
                                     @if($attar['rating'] % 1 != 0)
-                                        <i class="fas fa-star-half-alt"></i>
+                                        <i class="fas fa-star-half-alt" style="color: #FFD700;"></i>
                                     @endif
                                     <span>({{ $attar['reviews'] }})</span>
                                 </div>
@@ -262,7 +261,7 @@
         }
 
         .rating-attar {
-            color: #000000;
+            color: #FFD700;
             font-size: 0.9rem;
             margin-bottom: 1rem;
         }

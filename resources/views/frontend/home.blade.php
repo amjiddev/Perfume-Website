@@ -148,20 +148,24 @@
                                 <h5>{{ $perfume->name }}</h5>
                                 <div class="rating-perfume">
                                     @for($i = 0; $i < floor($perfume->rating); $i++)
-                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star" style="color: #FFD700;"></i>
                                     @endfor
                                     @if($perfume->rating % 1 != 0)
-                                        <i class="fas fa-star-half-alt"></i>
+                                        <i class="fas fa-star-half-alt" style="color: #FFD700;"></i>
                                     @endif
                                     <span>({{ $perfume->reviews_count }} reviews)</span>
                                 </div>
                                 @if($perfume->price)
-                                    <p class="price-perfume">Rs {{ number_format($perfume->price) }}</p>
-                                    @if($perfume->original_price)
-                                        <p class="original-price-perfume"><s>Rs {{ number_format($perfume->original_price) }}</s></p>
-                                    @endif
+                                    <div class="price-section-perfume">
+                                        <p class="price-perfume">Rs {{ number_format($perfume->price) }}</p>
+                                        @if($perfume->original_price)
+                                            <p class="original-price-perfume"><s>Rs {{ number_format($perfume->original_price) }}</s></p>
+                                        @endif
+                                    </div>
                                 @elseif($perfume->original_price)
-                                    <p class="price-perfume">Rs {{ number_format($perfume->original_price) }}</p>
+                                    <div class="price-section-perfume">
+                                        <p class="price-perfume">Rs {{ number_format($perfume->original_price) }}</p>
+                                    </div>
                                 @endif
                                 <button class="btn-shop-now-perfume add-to-cart-btn" 
                                         data-product-id="{{ $perfume->id }}" 
@@ -482,13 +486,13 @@
             color: #000000;
             font-size: 1.2rem;
             font-weight: 700;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
         }
 
         .rating-perfume {
             color: #000000;
             font-size: 0.9rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
         }
 
         .rating-perfume span {
@@ -497,11 +501,19 @@
             font-size: 0.85rem;
         }
 
+        .price-section-perfume {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            justify-content: center;
+            margin: 0.5rem 0 1rem 0;
+        }
+
         .price-perfume {
             font-size: 1.1rem;
             color: #000000;
             font-weight: 700;
-            margin: 0.5rem 0;
+            margin: 0;
         }
 
         .original-price-perfume {
@@ -867,6 +879,7 @@
             // Update on window resize
             window.addEventListener('resize', updateCarouselPosition);
         }
+<<<<<<< HEAD
 
         // Add to Cart Function
         function addToCart(productId, productName, productPrice, productImage) {
@@ -979,6 +992,8 @@
                 setTimeout(() => notification.remove(), 300);
             }, 2000);
         }
+=======
+>>>>>>> 405926278d214507de98524ce7e136870e96aa0e
     </script>
 
 

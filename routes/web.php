@@ -25,6 +25,39 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['admin_or_redirect'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile update routes
+    Route::post('/admin/profile/update', function () {
+        $user = Auth::user();
+        
+        if (request()->hasFile('profile_photo_path')) {
+            $path = request()->file('profile_photo_path')->store('profile', 'public');
+            $user->profile_photo_path = 'storage/' . $path;
+        }
+        
+        $user->name = request('name');
+        $user->email = request('email');
+        $user->save();
+        
+        return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
+    });
+    
+    Route::post('/admin/password/update', function () {
+        $user = Auth::user();
+        
+        if (!Hash::check(request('current_password'), $user->password)) {
+            return response()->json(['success' => false, 'message' => 'Current password is incorrect']);
+        }
+        
+        if (request('password') !== request('password_confirmation')) {
+            return response()->json(['success' => false, 'message' => 'Passwords do not match']);
+        }
+        
+        $user->password = Hash::make(request('password'));
+        $user->save();
+        
+        return response()->json(['success' => true, 'message' => 'Password updated successfully']);
+    });
 
     Route::name('user-management.')->group(function () {
         Route::resource('/user-management/users', UserManagementController::class);

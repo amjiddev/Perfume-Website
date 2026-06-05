@@ -14,12 +14,6 @@ Reviews Management
 <h5 class="card-title mb-0">Reviews Management</h5>
 </div>
 <div class="card-body">
-@if (session('success'))
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-{{ session('success') }}
-<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
 @if ($errors->any())
 <div class="alert alert-danger alert-dismissible fade show" role="alert">
 <ul class="mb-0">
@@ -82,12 +76,14 @@ Reviews Management
 @endif
 </td>
 <td>
+<div class="d-flex gap-2">
 <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editReviewModal{{ $review->id }}">Edit</button>
-<form action="{{ route('admin.reviews.delete', $review) }}" method="POST" style="display: inline;">
+<form action="{{ route('admin.reviews.delete', $review) }}" method="POST">
 @csrf
 @method('DELETE')
 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
 </form>
+</div>
 </td>
 </tr>
 @empty

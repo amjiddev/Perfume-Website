@@ -72,6 +72,46 @@
     animation: checkBounce 0.5s ease;
 }
 
+/* Product Quantity Badge inside Button */
+.product-qty-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.5);
+    color: #000000;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
+    margin-right: 0.5rem;
+    animation: badgeAppear 0.3s ease;
+    flex-shrink: 0;
+}
+
+/* Button spacing adjustment when badge exists */
+.add-to-cart-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes badgeAppear {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 @keyframes checkBounce {
     0%, 100% {
         transform: scale(1);
@@ -162,5 +202,4 @@
 }
 
 .add-to-cart-btn.added-to-cart {
-    animation: successPulse 0.6s;
-}
+    animation: successPulse 0.6s}

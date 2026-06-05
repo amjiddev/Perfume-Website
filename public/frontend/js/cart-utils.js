@@ -46,6 +46,9 @@ function initAddToCartButtons() {
     });
 
     document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        // Update button badge on init
+        updateProductBadge(button);
+
         button.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -75,12 +78,49 @@ function initAddToCartButtons() {
                     setTimeout(() => {
                         this.innerHTML = originalHTML;
                         this.classList.remove('added-to-cart');
+                        // Update badge after adding
+                        updateProductBadge(this);
+                        // Update all product badges
+                        updateAllProductBadges();
                     }, 1500);
                 } else {
                     this.innerHTML = originalHTML;
                 }
             }, 300);
         });
+    });
+}
+
+// Update product quantity badge on button
+function updateProductBadge(button) {
+    const productId = parseInt(button.getAttribute('data-product-id'));
+    
+    // Remove existing badge if any
+    const existingBadge = button.querySelector('.product-qty-badge');
+    if (existingBadge) {
+        existingBadge.remove();
+    }
+
+    // Check cart for this product
+    if (typeof cartManager !== 'undefined') {
+        const cartItem = cartManager.items.find(item => item.id === productId);
+        
+        if (cartItem && cartItem.quantity > 0) {
+            // Create badge - will be inserted before the icon
+            const badge = document.createElement('span');
+            badge.className = 'product-qty-badge';
+            badge.textContent = cartItem.quantity;
+            
+            // Insert badge as first child of button (before icon)
+            button.insertBefore(badge, button.firstChild);
+        }
+    }
+}
+
+// Update all product badges
+function updateAllProductBadges() {
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        updateProductBadge(button);
     });
 }
 
@@ -118,13 +158,54 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Initialize on page load
+// Override cartManager methods to update badges after cart operations
 document.addEventListener('DOMContentLoaded', function() {
     initAddToCartButtons();
+    
+    // Update badges after a short delay to ensure cart is loaded
+    setTimeout(() => {
+        updateAllProductBadges();
+    }, 200);
+    
+    // Hook into cartManager's methods to update badges
+    if (typeof cartManager !== 'undefined') {
+        // Store original methods
+        const originalRemoveItem = cartManager.removeItem.bind(cartManager);
+        const originalUpdateQuantity = cartManager.updateQuantity.bind(cartManager);
+        
+        // Override removeItem to update badges
+        cartManager.removeItem = function(productId) {
+            originalRemoveItem(productId);
+            setTimeout(() => updateAllProductBadges(), 100);
+        };
+        
+        // Override updateQuantity to update badges
+        cartManager.updateQuantity = function(productId, quantity) {
+            originalUpdateQuantity(productId, quantity);
+            setTimeout(() => updateAllProductBadges(), 100);
+        };
+        
+        console.log('Product badges hooked into cartManager');
+    }
+});
+
+// Listen for storage changes (cart updates from other tabs)
+window.addEventListener('storage', function(e) {
+    if (e.key === 'perfume_cart') {
+        updateAllProductBadges();
+    }
+});
+
+// Update badges when page becomes visible
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        updateAllProductBadges();
+    }
 });
 
 // Re-initialize when content is dynamically loaded
 window.reinitAddToCartButtons = initAddToCartButtons;
+window.updateAllProductBadges = updateAllProductBadges;
 
 // Make functions globally accessible
 window.addToCart = addToCart;

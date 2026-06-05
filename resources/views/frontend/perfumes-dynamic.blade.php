@@ -26,17 +26,16 @@
                             @if($perfume->discount_percentage)
                                 <span class="sale-badge">-{{ $perfume->discount_percentage }}%</span>
                             @endif
-                            <button class="wishlist-btn-perfume" title="Add to Wishlist"><i class="far fa-heart"></i></button>
                         </div>
                         <div class="product-info">
                             <h5>{{ $perfume->name }}</h5>
                             <p class="product-desc">{{ $perfume->description }}</p>
                             <div class="rating-perfume">
                                 @for($i = 0; $i < floor($perfume->rating); $i++)
-                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star" style="color: #FFD700;"></i>
                                 @endfor
                                 @if($perfume->rating % 1 != 0)
-                                    <i class="fas fa-star-half-alt"></i>
+                                    <i class="fas fa-star-half-alt" style="color: #FFD700;"></i>
                                 @endif
                                 <span>({{ $perfume->reviews_count }})</span>
                             </div>
@@ -238,7 +237,7 @@
         }
 
         .rating-perfume {
-            color: #000000;
+            color: #FFD700;
             font-size: 0.9rem;
             margin-bottom: 1rem;
         }

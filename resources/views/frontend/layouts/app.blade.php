@@ -325,7 +325,12 @@
             setupCartEvents() {
                 const cartLink = document.querySelector('.navbar-cart-link');
                 if (cartLink) {
-                    cartLink.addEventListener('click', (e) => {
+                    // Remove old listener by cloning and replacing
+                    const newCartLink = cartLink.cloneNode(true);
+                    cartLink.parentNode.replaceChild(newCartLink, cartLink);
+                    
+                    // Add fresh listener
+                    newCartLink.addEventListener('click', (e) => {
                         e.preventDefault();
                         this.toggleCartDrawer();
                     });
@@ -355,11 +360,14 @@
 
                 if (emptyMessage) emptyMessage.style.display = 'none';
 
-                itemsContainer.innerHTML = this.items.map(item => `
+                itemsContainer.innerHTML = this.items.map(item => {
+                    // Get only first word, rest becomes "..."
+                    let displayName = item.name.split(' ')[0] + '...';
+                    return `
                     <div class="cart-item">
                         <img src="${item.image}" alt="${item.name}" class="cart-item-image">
                         <div class="cart-item-details">
-                            <h6>${item.name}</h6>
+                            <h6 title="${item.name}">${displayName}</h6>
                             <p class="cart-item-price">Rs ${(item.price * item.quantity).toLocaleString()}</p>
                         </div>
                         <div class="cart-item-actions">
@@ -373,7 +381,8 @@
                             </button>
                         </div>
                     </div>
-                `).join('');
+                `;
+                }).join('');
 
                 // Add event listeners to quantity buttons
                 itemsContainer.querySelectorAll('.cart-qty-minus').forEach(btn => {
@@ -418,7 +427,9 @@
         // Update cart when page becomes visible (switching tabs)
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
+                console.log('Page became visible, reinitializing cart...');
                 cartManager.init();
+                cartManager.setupCartEvents();
             }
         });
 
