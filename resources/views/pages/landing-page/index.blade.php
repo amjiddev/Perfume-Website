@@ -16,23 +16,6 @@
                     <h5 class="card-title mb-0">Home Page Settings</h5>
                 </div>
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
 
                     <form action="{{ route('admin-landing-page.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -75,7 +58,12 @@
                                             @if($homePage->hero_image_1)
                                                 <div class="mt-2">
                                                     <small class="text-muted">Current image:</small>
-                                                    <img src="{{ asset($homePage->hero_image_1) }}" alt="Hero 1" style="max-width: 200px; max-height: 150px;">
+                                                    <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+                                                        <img src="{{ asset($homePage->hero_image_1) }}" alt="Hero 1" style="max-width: 200px; max-height: 150px; display: block;">
+                                                        <button type="button" class="btn btn-danger" onclick="deleteHeroImage('hero_image_1')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                            ×
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             @endif
                                         </div>
@@ -91,7 +79,12 @@
                                             @if($homePage->hero_image_2)
                                                 <div class="mt-2">
                                                     <small class="text-muted">Current image:</small>
-                                                    <img src="{{ asset($homePage->hero_image_2) }}" alt="Hero 2" style="max-width: 200px; max-height: 150px;">
+                                                    <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+                                                        <img src="{{ asset($homePage->hero_image_2) }}" alt="Hero 2" style="max-width: 200px; max-height: 150px; display: block;">
+                                                        <button type="button" class="btn btn-danger" onclick="deleteHeroImage('hero_image_2')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                            ×
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             @endif
                                         </div>
@@ -135,7 +128,12 @@
                                     @if($homePage->about_image)
                                         <div class="mt-2">
                                             <small class="text-muted">Current image:</small>
-                                            <img src="{{ asset($homePage->about_image) }}" alt="About" style="max-width: 200px; max-height: 150px;">
+                                            <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+                                                <img src="{{ asset($homePage->about_image) }}" alt="About" style="max-width: 200px; max-height: 150px; display: block;">
+                                                <button type="button" class="btn btn-danger" onclick="deleteHeroImage('about_image')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                    ×
+                                                </button>
+                                            </div>
                                         </div>
                                     @endif
                                 </div>
@@ -224,6 +222,89 @@ function addFeature() {
 
 function removeFeature(btn) {
     btn.parentElement.remove();
+}
+
+function deleteHeroImage(imageField) {
+    if (confirm('Are you sure you want to remove this image?')) {
+        fetch(`{{ route('admin-landing-page.delete-image') }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                image_field: imageField
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to reflect changes
+                window.location.reload();
+            } else {
+                alert('Error deleting image: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting image');
+        });
+    }
+}
+
+function deletePageImage(pageName, imageField) {
+    if (confirm('Are you sure you want to remove this image?')) {
+        const routeMap = {
+            'shop_page': 'admin.shop-page.delete-image',
+            'perfume_page': 'admin.perfume-page.delete-image',
+            'perfume_product': 'admin.perfume-page.delete-perfume-image',
+            'about_page': 'admin.about-page.delete-image',
+            'contact_page': 'admin.contact-page.delete-image',
+            'shop_product': 'admin.shop-page.delete-product-image'
+        };
+
+        const routeName = routeMap[pageName] || '';
+        let endpoint = '';
+
+        // Create endpoint URL based on page name
+        if (pageName === 'shop_page') {
+            endpoint = '{{ route("admin.shop-page.delete-image") }}';
+        } else if (pageName === 'perfume_page') {
+            endpoint = '{{ route("admin.perfume-page.delete-image") }}';
+        } else if (pageName === 'perfume_product') {
+            endpoint = `{{ url('admin/perfume-page/delete-perfume-image') }}/${imageField}`;
+        } else if (pageName === 'about_page') {
+            endpoint = '{{ route("admin.about-page.delete-image") }}';
+        } else if (pageName === 'contact_page') {
+            endpoint = '{{ route("admin.contact-page.delete-image") }}';
+        } else if (pageName === 'shop_product') {
+            endpoint = `{{ url('admin/shop-page/delete-product-image') }}/${imageField}`;
+        }
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                image_field: imageField,
+                page_name: pageName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Error deleting image: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting image');
+        });
+    }
 }
 </script>
 

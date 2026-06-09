@@ -6,8 +6,8 @@
     <!-- Hero Section with Slider -->
     <section class="hero-section" id="heroSlider">
         <div class="hero-slider-container">
-            <div class="hero-slide active" style="background-image: url('{{ asset($homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
-            <div class="hero-slide" style="background-image: url('{{ asset($homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            <div class="hero-slide active" id="heroSlide1" data-mobile="{{ asset($homePage->hero_image_1_mobile ?? $homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}" data-tablet="{{ asset($homePage->hero_image_1_tablet ?? $homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}" data-laptop="{{ asset($homePage->hero_image_1_laptop ?? $homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}" style="background-image: url('{{ asset($homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            <div class="hero-slide" id="heroSlide2" data-mobile="{{ asset($homePage->hero_image_2_mobile ?? $homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}" data-tablet="{{ asset($homePage->hero_image_2_tablet ?? $homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}" data-laptop="{{ asset($homePage->hero_image_2_laptop ?? $homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}" style="background-image: url('{{ asset($homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
         </div>
         
         <div class="hero-overlay"></div>
@@ -750,7 +750,30 @@
     </style>
 
     <script>
+        // Function to determine current device type and load appropriate image
+        function getDeviceType() {
+            const width = window.innerWidth;
+            if (width <= 768) return 'mobile';
+            if (width <= 1024) return 'tablet';
+            return 'laptop';
+        }
+
+        function updateHeroImages() {
+            const slides = document.querySelectorAll('.hero-slide');
+            const deviceType = getDeviceType();
+            
+            slides.forEach((slide, index) => {
+                const imageUrl = slide.getAttribute(`data-${deviceType}`);
+                if (imageUrl) {
+                    slide.style.backgroundImage = `url('${imageUrl}?v=${Date.now()}')`;
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Load appropriate images on page load
+            updateHeroImages();
+
             let currentSlideIndex = 0;
             const slides = document.querySelectorAll('.hero-slide');
             const indicators = document.querySelectorAll('.indicator');
@@ -807,6 +830,16 @@
                 showSlide(0);
                 startAutoSlide();
             }
+
+            // Make functions globally accessible
+            window.changeSlide = changeSlide;
+            window.currentSlide = currentSlide;
+
+            // Update images on window resize
+            window.addEventListener('resize', function() {
+                updateHeroImages();
+            });
+        });
 
             // Make functions globally accessible
             window.changeSlide = changeSlide;

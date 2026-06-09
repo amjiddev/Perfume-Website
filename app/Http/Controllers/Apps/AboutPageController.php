@@ -95,4 +95,30 @@ class AboutPageController extends Controller
 
         return redirect()->back()->with('success', 'About page updated successfully!');
     }
+
+    public function deleteImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'image_field' => 'required|in:hero_image,content_section_1_image,content_section_2_image',
+            ]);
+
+            $imageField = $request->input('image_field');
+            $aboutPage = AboutPage::first();
+
+            if (!$aboutPage) {
+                return response()->json(['success' => false, 'message' => 'About page not found']);
+            }
+
+            $imagePath = $aboutPage->$imageField;
+            if ($imagePath && file_exists(public_path($imagePath))) {
+                unlink(public_path($imagePath));
+            }
+
+            $aboutPage->update([$imageField => null]);
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Unable to delete image']);
+        }
+    }
 }

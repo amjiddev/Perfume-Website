@@ -148,6 +148,46 @@ class PerfumePageController extends Controller
         return back()->with('success', 'Perfume updated successfully!');
     }
 
+    public function deleteImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'image_field' => 'required|in:hero_image',
+            ]);
+
+            $imageField = $request->input('image_field');
+            $perfumePage = PerfumePage::first();
+
+            if (!$perfumePage) {
+                return response()->json(['success' => false, 'message' => 'Perfume page not found']);
+            }
+
+            $imagePath = $perfumePage->$imageField;
+            if ($imagePath && file_exists(public_path($imagePath))) {
+                unlink(public_path($imagePath));
+            }
+
+            $perfumePage->update([$imageField => null]);
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Unable to delete image']);
+        }
+    }
+
+    public function deletePerfumeImage(Request $request, Perfume $perfume)
+    {
+        try {
+            if ($perfume->image && file_exists(public_path($perfume->image))) {
+                unlink(public_path($perfume->image));
+            }
+
+            $perfume->update(['image' => null]);
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Unable to delete image']);
+        }
+    }
+
     public function deletePerfume(Perfume $perfume)
     {
         if ($perfume->image && file_exists(public_path($perfume->image))) {
@@ -157,6 +197,4 @@ class PerfumePageController extends Controller
         $perfume->delete();
         return redirect()->back()->with('success', 'Perfume deleted successfully!');
     }
-
-
 }

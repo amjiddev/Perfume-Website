@@ -68,11 +68,14 @@ Route::middleware(['admin_or_redirect'])->group(function () {
     Route::controller(LandingPageController::class)->prefix('admin/landing-page')->as('admin-landing-page.')->group(function () {
         Route::get('/', 'index')->name('list');
         Route::put('/', 'update')->name('update');
+        Route::post('delete-image', 'deleteImage')->name('delete-image');
     });
 
     Route::controller(ShopPageController::class)->prefix('admin/shop-page')->as('admin.shop-page.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/', 'update')->name('update');
+        Route::post('delete-image', 'deleteImage')->name('delete-image');
+        Route::post('delete-product-image/{product}', 'deleteProductImage')->name('delete-product-image');
         Route::post('products', 'storeProduct')->name('store-product');
         Route::put('products/{product}', 'updateProduct')->name('update-product');
         Route::delete('products/{product}', 'deleteProduct')->name('delete-product');
@@ -81,11 +84,13 @@ Route::middleware(['admin_or_redirect'])->group(function () {
     Route::controller(AboutPageController::class)->prefix('admin/about-page')->as('admin.about-page.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/', 'update')->name('update');
+        Route::post('delete-image', 'deleteImage')->name('delete-image');
     });
 
     Route::controller(ContactPageController::class)->prefix('admin/contact-page')->as('admin.contact-page.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/', 'update')->name('update');
+        Route::post('delete-image', 'deleteImage')->name('delete-image');
     });
 
     Route::controller(GuestGiftController::class)->prefix('admin/guest-gift')->as('admin.guest-gift.')->group(function () {
@@ -98,6 +103,8 @@ Route::middleware(['admin_or_redirect'])->group(function () {
     Route::controller(PerfumePageController::class)->prefix('admin/perfume-page')->as('admin.perfume-page.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/', 'update')->name('update');
+        Route::post('delete-image', 'deleteImage')->name('delete-image');
+        Route::post('delete-perfume-image/{perfume}', 'deletePerfumeImage')->name('delete-perfume-image');
         Route::post('perfumes', 'storePerfume')->name('store-perfume');
         Route::put('perfumes/{perfume}', 'updatePerfume')->name('update-perfume');
         Route::delete('perfumes/{perfume}', 'deletePerfume')->name('delete-perfume');

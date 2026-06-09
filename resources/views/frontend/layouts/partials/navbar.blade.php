@@ -4,9 +4,19 @@
         <a class="navbar-brand" href="{{ route('home') }}">
              <img src="{{ asset('frontend/images/loogo.jpeg') }}" alt="Perfumes for Men">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        
+        <div class="navbar-right-section">
+            <!-- Mobile Cart Icon - Show only on mobile -->
+            <a href="#" class="navbar-cart-link navbar-cart-link-mobile" title="View Cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" id="cartBadgeMobile" style="display: none;">0</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
@@ -28,7 +38,7 @@
                     <a class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">Contact</a>
                 </li>
             </ul>
-            <div class="navbar-icons">
+            <div class="navbar-icons navbar-icons-desktop">
                 <a href="#" class="navbar-cart-link" title="View Cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge" id="cartBadge" style="display: none;">0</span>

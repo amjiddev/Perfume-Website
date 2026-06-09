@@ -14,22 +14,7 @@ Perfume Page Settings
 <h5 class="card-title mb-0">Perfume Page Settings</h5>
 </div>
 <div class="card-body">
-@if (session('success'))
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-{{ session('success') }}
-<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
-@if ($errors->any())
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-<ul class="mb-0">
-@foreach ($errors->all() as $error)
-<li>{{ $error }}</li>
-@endforeach
-</ul>
-<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-@endif
+
 <form action="{{ route('admin.perfume-page.update') }}" method="POST" enctype="multipart/form-data">
 @csrf
 @method('PUT')
@@ -52,7 +37,12 @@ Perfume Page Settings
 @if($perfumePage->hero_image)
 <div class="mt-2">
 <small class="text-muted">Current image:</small>
-<img src="{{ asset($perfumePage->hero_image) }}" alt="Hero" style="max-width: 200px;">
+<div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+<img src="{{ asset($perfumePage->hero_image) }}" alt="Hero" style="max-width: 200px; display: block;">
+<button type="button" class="btn btn-danger" onclick="deletePageImage('perfume_page', 'hero_image')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+×
+</button>
+</div>
 </div>
 @endif
 </div>
@@ -298,7 +288,12 @@ Perfume Page Settings
 @if($perfume->image)
 <div class="mt-2">
 <small class="text-muted">Current image:</small>
-<img src="{{ asset($perfume->image) }}" alt="{{ $perfume->name }}" style="max-width: 100px;">
+<div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+<img src="{{ asset($perfume->image) }}" alt="{{ $perfume->name }}" style="max-width: 100px; display: block;">
+<button type="button" class="btn btn-danger" onclick="deletePageImage('perfume_product', '{{ $perfume->id }}')" title="Remove image" style="position: absolute; top: -8px; right: -8px; padding: 0; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+×
+</button>
+</div>
 </div>
 @endif
 </div>
@@ -316,7 +311,6 @@ Perfume Page Settings
 @endsection
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-const addForm = document.getElementById('addPerfumeForm');
 const editForms = document.querySelectorAll('[id^="editPerfumeForm"]');
 
 if (addForm) {
@@ -394,5 +388,44 @@ discountInput.value = '';
 };
 originalPriceInput.addEventListener('input', calculateDiscount);
 priceInput.addEventListener('input', calculateDiscount);
+}
+</script>
+
+
+<script>
+function deletePageImage(pageName, imageField) {
+    if (confirm('Are you sure you want to remove this image?')) {
+        let endpoint = '';
+        
+        if (pageName === 'perfume_page') {
+            endpoint = '{{ route("admin.perfume-page.delete-image") }}';
+        } else if (pageName === 'perfume_product') {
+            endpoint = `{{ url('admin/perfume-page/delete-perfume-image') }}/${imageField}`;
+        }
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                image_field: imageField,
+                page_name: pageName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Error deleting image: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting image');
+        });
+    }
 }
 </script>

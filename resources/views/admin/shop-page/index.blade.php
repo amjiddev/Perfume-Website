@@ -19,23 +19,6 @@
                     <h5 class="card-title mb-0">Shop Page Settings</h5>
                 </div>
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
 
                     <form action="{{ route('admin.shop-page.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -76,7 +59,12 @@
                                     @if($shopPage->hero_image)
                                         <div class="mt-2">
                                             <small class="text-muted">Current image:</small>
-                                            <img src="{{ asset($shopPage->hero_image) }}" alt="Hero" style="max-width: 200px; max-height: 150px;">
+                                            <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+                                                <img src="{{ asset($shopPage->hero_image) }}" alt="Hero" style="max-width: 200px; max-height: 150px; display: block;">
+                                                <button type="button" class="btn btn-danger" onclick="deletePageImage('shop_page', 'hero_image')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                    ×
+                                                </button>
+                                            </div>
                                         </div>
                                     @endif
                                 </div>
@@ -186,7 +174,7 @@
                     <h5 class="modal-title">Add New Product</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.shop-page.store-product') }}" method="POST" enctype="multipart/form-data" novalidate>
+                <form action="{{ route('admin.shop-page.store-product') }}" method="POST" enctype="multipart/form-data" novalidate id="addProductForm">
                     @csrf
                     <div class="modal-body">
                         <div class="row">
@@ -365,7 +353,12 @@
                                 @if($product->image)
                                     <div class="mt-2">
                                         <small class="text-muted">Current image:</small>
-                                        <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" style="max-width: 100px; max-height: 100px; border-radius: 4px;">
+                                        <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+                                            <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" style="max-width: 100px; max-height: 100px; border-radius: 4px; display: block;">
+                                            <button type="button" class="btn btn-danger" onclick="deletePageImage('shop_product', '{{ $product->id }}')" title="Remove image" style="position: absolute; top: -8px; right: -8px; padding: 0; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                ×
+                                            </button>
+                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -393,23 +386,31 @@ document.addEventListener('DOMContentLoaded', function() {
         let hasAddError = false;
         
         addModalFields.forEach(field => {
-            if (document.getElementById(field) && document.getElementById(field).classList.contains('is-invalid')) {
-                hasAddError = true;
+            const element = document.getElementById(field);
+            // Only check the add modal fields (without product ID suffix)
+            if (element && element.classList.contains('is-invalid')) {
+                // Make sure this is from the add modal, not an edit modal field
+                const form = element.closest('form');
+                if (form && form.id === 'addProductForm') {
+                    hasAddError = true;
+                }
             }
         });
         
         if (hasAddError) {
             const modal = new bootstrap.Modal(document.getElementById('addProductModal'));
             modal.show();
+            return; // Exit here, don't check edit modals
         }
         
-        // Check edit modals
+        // Check edit modals - only open the FIRST one with errors
         @foreach($products as $product)
             const editFields{{ $product->id }} = ['name{{ $product->id }}', 'category{{ $product->id }}', 'price{{ $product->id }}', 'original_price{{ $product->id }}', 'description{{ $product->id }}', 'rating{{ $product->id }}', 'reviews_count{{ $product->id }}', 'image{{ $product->id }}'];
             let hasEditError{{ $product->id }} = false;
             
             editFields{{ $product->id }}.forEach(field => {
-                if (document.getElementById(field) && document.getElementById(field).classList.contains('is-invalid')) {
+                const fieldElement = document.getElementById(field);
+                if (fieldElement && fieldElement.classList.contains('is-invalid')) {
                     hasEditError{{ $product->id }} = true;
                 }
             });
@@ -417,6 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (hasEditError{{ $product->id }}) {
                 const editModal = new bootstrap.Modal(document.getElementById('editProductModal{{ $product->id }}'));
                 editModal.show();
+                return; // Stop after opening the first modal with errors
             }
         @endforeach
     @endif
@@ -485,4 +487,43 @@ if (priceInput && originalPriceInput && discountInput) {
         });
     }
 @endforeach
+</script>
+
+
+<script>
+function deletePageImage(pageName, imageField) {
+    if (confirm('Are you sure you want to remove this image?')) {
+        let endpoint = '';
+        
+        if (pageName === 'shop_page') {
+            endpoint = '{{ route("admin.shop-page.delete-image") }}';
+        } else if (pageName === 'shop_product') {
+            endpoint = `{{ url('admin/shop-page/delete-product-image') }}/${imageField}`;
+        }
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                image_field: imageField,
+                page_name: pageName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Error deleting image: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting image');
+        });
+    }
+}
 </script>

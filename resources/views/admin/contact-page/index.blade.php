@@ -19,23 +19,6 @@
                     <h5 class="card-title mb-0">Contact Page Settings</h5>
                 </div>
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
 
                     <form action="{{ route('admin.contact-page.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -94,7 +77,12 @@
                                     @if($contactPage->hero_image)
                                         <div class="mt-2">
                                             <small class="text-muted">Current image:</small>
-                                            <img src="{{ asset($contactPage->hero_image) }}" alt="Hero" style="max-width: 200px; max-height: 150px; border-radius: 4px;">
+                                            <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+                                                <img src="{{ asset($contactPage->hero_image) }}" alt="Hero" style="max-width: 200px; max-height: 150px; border-radius: 4px; display: block;">
+                                                <button type="button" class="btn btn-danger" onclick="deletePageImage('contact_page', 'hero_image')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                    ×
+                                                </button>
+                                            </div>
                                         </div>
                                     @endif
                                 </div>
@@ -228,3 +216,36 @@
 
 </x-default-layout>
 @endsection
+
+
+<script>
+function deletePageImage(pageName, imageField) {
+    if (confirm('Are you sure you want to remove this image?')) {
+        let endpoint = '{{ route("admin.contact-page.delete-image") }}';
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                image_field: imageField,
+                page_name: pageName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Error deleting image: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting image');
+        });
+    }
+}
+</script>
