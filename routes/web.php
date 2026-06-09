@@ -7,7 +7,6 @@ use App\Http\Controllers\Apps\GuestGiftController;
 use App\Http\Controllers\Apps\HomePageController;
 use App\Http\Controllers\Apps\PermissionManagementController;
 use App\Http\Controllers\Apps\PerfumePageController;
-use App\Http\Controllers\Apps\ReviewController;
 use App\Http\Controllers\Apps\RoleManagementController;
 use App\Http\Controllers\Apps\ShopPageController;
 use App\Http\Controllers\Apps\UserManagementController;
@@ -110,11 +109,14 @@ Route::middleware(['admin_or_redirect'])->group(function () {
         Route::delete('perfumes/{perfume}', 'deletePerfume')->name('delete-perfume');
     });
 
-    Route::controller(ReviewController::class)->prefix('admin/reviews')->as('admin.reviews.')->group(function () {
+    Route::controller(\App\Http\Controllers\Apps\AttarPageController::class)->prefix('admin/attar-page')->as('admin.attar-page.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::post('/', 'store')->name('store');
-        Route::put('{review}', 'update')->name('update');
-        Route::delete('{review}', 'delete')->name('delete');
+        Route::put('/', 'update')->name('update');
+        Route::post('delete-image', 'deleteImage')->name('delete-image');
+        Route::post('delete-product-image/{attarProduct}', 'deleteProductImage')->name('delete-product-image');
+        Route::post('products', 'storeProduct')->name('store-product');
+        Route::put('products/{attarProduct}', 'updateProduct')->name('update-product');
+        Route::delete('products/{attarProduct}', 'deleteProduct')->name('delete-product');
     });
 
     Route::controller(HomePageController::class)->prefix('admin/home-page')->as('admin.home-page.')->group(function () {
@@ -126,6 +128,12 @@ Route::middleware(['admin_or_redirect'])->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('edit', 'edit')->name('edit');
         Route::put('/', 'update')->name('update');
+    });
+
+    Route::controller(\App\Http\Controllers\Apps\ContactMessageController::class)->prefix('admin/messages')->as('admin.messages.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{message}', 'show')->name('show');
+        Route::delete('{message}', 'destroy')->name('destroy');
     });
 });
 

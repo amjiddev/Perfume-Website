@@ -45,8 +45,8 @@
                 @forelse($products as $index => $product)
                     <div class="col-lg-4 col-md-6 mb-4 shop-product-item" data-index="{{ $index }}" data-category="all,{{ $product->category }}" style="display: {{ $index < 3 ? 'block' : 'none' }};">
                         <div class="product-card">
-                            <div class="product-image-shop">
-                                <img src="{{ asset($product->image ?? 'frontend/images/perfume2.jpg') }}" alt="{{ $product->name }}" class="img-fluid">
+                            <div class="product-image-shop" onclick="goToProductDetail({{ $product->id }})">
+                                <img src="{{ asset($product->image ?? 'frontend/images/perfume2.jpg') }}" alt="{{ $product->name }}" class="img-fluid" style="cursor: pointer;">
                                 @if($product->discount_percentage && $product->discount_percentage > 0)
                                     <span class="sale-badge">-{{ $product->discount_percentage }}%</span>
                                 @endif
@@ -227,6 +227,10 @@
             showAboutPage: {{ $shopPage?->show_about_page ? 'true' : 'false' }},
             showShopByCategory: {{ $shopPage?->show_shop_by_category ? 'true' : 'false' }}
         };
+
+        function goToProductDetail(productId) {
+            window.location.href = '{{ route("product.detail", "") }}' + '/' + productId;
+        }
 
         function filterCategory(category) {
             currentCategory = category;

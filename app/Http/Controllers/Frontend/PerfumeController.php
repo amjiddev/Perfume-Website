@@ -29,11 +29,7 @@ class PerfumeController extends Controller
 
     public function attar()
     {
-        $reviews = \App\Models\Review::whereIn('display_section', ['attar', 'both'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        return view('frontend.attar', compact('reviews'));
+        return view('frontend.attar');
     }
 
     public function about()
@@ -78,60 +74,66 @@ class PerfumeController extends Controller
     public function productDetail($id)
     {
         // Try to get from Perfume model first (for best sellers)
-        $product = \App\Models\Perfume::find($id);
+        $productModel = \App\Models\Perfume::find($id);
+        $relatedProducts = [];
         
-        // If not found in Perfume model, try the Products data class
-        if (!$product) {
-            $productData = Products::getById($id);
-            if (!$productData) {
+        // If not found in Perfume, try Product model (for shop categories)
+        if (!$productModel) {
+            $productModel = \App\Models\Product::find($id);
+            if (!$productModel) {
                 abort(404, 'Product not found');
             }
-            return view('frontend.product-detail', [
-                'product' => (object)$productData,
-                'relatedProducts' => array_map(function($p) { return (object)$p; }, Products::getRelated($id))
-            ]);
-            return view('frontend.perfume-detail', [
-            'product' => $product,
-            'relatedProducts' => $relatedProducts
-        ]);
+            
+            // Get related products from Product model
+            $relatedProducts = \App\Models\Product::where('id', '!=', $id)
+                ->limit(4)
+                ->get()
+                ->map(function($p) {
+                    return [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'image' => $p->image,
+                        'price' => $p->price,
+                        'original_price' => $p->original_price,
+                        'discount_percentage' => $p->discount_percentage ?? 0,
+                        'description' => $p->description
+                    ];
+                })
+                ->toArray();
+        } else {
+            // Get related products from Perfume model
+            $relatedProducts = \App\Models\Perfume::where('id', '!=', $id)
+                ->limit(4)
+                ->get()
+                ->map(function($p) {
+                    return [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'image' => $p->image,
+                        'price' => $p->price,
+                        'original_price' => $p->original_price,
+                        'discount_percentage' => $p->discount_percentage ?? 0,
+                        'description' => $p->description
+                    ];
+                })
+                ->toArray();
         }
         
-        // Convert Perfume model to array-like structure for view compatibility
+        // Convert to array format for view compatibility
         $product = [
-            'id' => $product->id,
-            'name' => $product->name,
-            'image' => $product->image,
-            'price' => $product->price,
-            'original_price' => $product->original_price,
-            'discount_percentage' => $product->discount_percentage ?? 0,
-            'rating' => $product->rating ?? 0,
-            'reviews_count' => $product->reviews_count ?? 0,
-            'description' => $product->description,
-            'features' => $product->features ? (is_array($product->features) ? $product->features : json_decode($product->features, true)) : []
+            'id' => $productModel->id,
+            'name' => $productModel->name,
+            'image' => $productModel->image,
+            'price' => $productModel->price,
+            'original_price' => $productModel->original_price,
+            'discount_percentage' => $productModel->discount_percentage ?? 0,
+            'rating' => $productModel->rating ?? 0,
+            'reviews_count' => $productModel->reviews_count ?? 0,
+            'description' => $productModel->description,
+            'features' => $productModel->features ? (is_array($productModel->features) ? $productModel->features : json_decode($productModel->features, true)) : []
         ];
         
-        // Get related products from Perfume model
-        $relatedProducts = \App\Models\Perfume::where('id', '!=', $id)
-            ->limit(4)
-            ->get()
-            ->map(function($p) {
-                return [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'image' => $p->image,
-                    'price' => $p->price,
-                    'original_price' => $p->original_price,
-                    'discount_percentage' => $p->discount_percentage ?? 0,
-                    'description' => $p->description
-                ];
-            })
-            ->toArray();
-        
         return view('frontend.product-detail', [
-            'product' => $product,
-            'relatedProducts' => $relatedProducts
-        ]);
-        return view('frontend.perfume-detail', [
             'product' => $product,
             'relatedProducts' => $relatedProducts
         ]);

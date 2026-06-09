@@ -18,29 +18,50 @@
                     </div>
                     <div class="notification-list">
                         @forelse($notifications as $notification)
-                            <div class="notification-item" data-notification-id="{{ $notification->id }}" data-order-data='{{ json_encode([
-                                "id" => $notification->id,
-                                "customer_name" => $notification->customer_name,
-                                "email" => $notification->email,
-                                "phone" => $notification->phone,
-                                "address" => $notification->address,
-                                "city" => $notification->city,
-                                "state" => $notification->state,
-                                "zip" => $notification->zip,
-                                "products" => $notification->products,
-                                "total" => $notification->total,
-                                "notes" => $notification->notes,
-                                "status" => $notification->status
-                            ]) }}' style="cursor: pointer;">
-                                <div class="notification-icon">
-                                    <i class="fas fa-shopping-cart"></i>
+                            @if($notification->type === 'order')
+                                <div class="notification-item" data-notification-id="{{ $notification->id }}" data-order-data='{{ json_encode([
+                                    "id" => str_replace("order-", "", $notification->id),
+                                    "customer_name" => $notification->customer_name,
+                                    "email" => $notification->email,
+                                    "phone" => $notification->phone,
+                                    "address" => $notification->address,
+                                    "city" => $notification->city,
+                                    "state" => $notification->state,
+                                    "zip" => $notification->zip,
+                                    "products" => $notification->products,
+                                    "total" => $notification->total,
+                                    "notes" => $notification->notes,
+                                    "status" => $notification->status
+                                ]) }}' style="cursor: pointer;">
+                                    <div class="notification-icon">
+                                        <i class="{{ $notification->icon }}"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-title">{{ $notification->title }}</p>
+                                        <p class="notification-message">{{ $notification->message }}</p>
+                                        <p class="notification-time">{{ $notification->created_at->diffForHumans() }}</p>
+                                    </div>
                                 </div>
-                                <div class="notification-content">
-                                    <p class="notification-title">New Order from {{ $notification->customer_name }}</p>
-                                    <p class="notification-message">Order Total: Rs {{ number_format($notification->total, 2) }}</p>
-                                    <p class="notification-time">{{ $notification->created_at->diffForHumans() }}</p>
+                            @elseif($notification->type === 'message')
+                                <div class="notification-item message-notification" data-notification-id="{{ $notification->id }}" data-message-data='{{ json_encode([
+                                    "id" => str_replace("message-", "", $notification->id),
+                                    "name" => $notification->name,
+                                    "email" => $notification->email,
+                                    "phone" => $notification->phone,
+                                    "subject" => $notification->subject,
+                                    "message" => $notification->message_body,
+                                    "is_read" => $notification->is_read
+                                ]) }}' style="cursor: pointer; border-left: 4px solid #28a745;">
+                                    <div class="notification-icon">
+                                        <i class="{{ $notification->icon }}"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p class="notification-title">{{ $notification->title }}</p>
+                                        <p class="notification-message">{{ $notification->message }}</p>
+                                        <p class="notification-time">{{ $notification->created_at->diffForHumans() }}</p>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         @empty
                             <div class="notification-empty">
                                 <i class="fas fa-inbox"></i>

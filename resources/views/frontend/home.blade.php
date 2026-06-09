@@ -14,7 +14,10 @@
         
         <div class="hero-content">
             <div class="hero-text">
-                <h1>{{ $homePage->hero_heading }}</h1>
+                <h1>
+                    <span class="hero-static">DISCOVER</span>
+                    <span class="hero-dynamic" id="heroDynamicText">LUXURY</span>
+                </h1>
                 <p>{{ $homePage->hero_subheading }}</p>
                 <div class="hero-buttons">
                     <a href="/perfumes" class="btn-primary-custom">
@@ -252,14 +255,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Testimonials Section -->
-    @php
-        $reviews = \App\Models\Review::where('display_section', 'home')->get();
-    @endphp
-    @if($reviews->count() > 0)
-        @include('frontend.components.testimonials-section', ['reviews' => $reviews])
-    @endif
 
     <!-- Newsletter Section -->
     <section class="newsletter-section">
@@ -750,7 +745,13 @@
     </style>
 
     <script>
-        // Function to determine current device type and load appropriate image
+        // ================================================
+        // HERO SLIDER
+        // ================================================
+        let currentSlideIndex = 0;
+        let autoSlideTimer = null;
+        let slides, indicators, totalSlides;
+
         function getDeviceType() {
             const width = window.innerWidth;
             if (width <= 768) return 'mobile';
@@ -759,10 +760,10 @@
         }
 
         function updateHeroImages() {
-            const slides = document.querySelectorAll('.hero-slide');
+            const slideElements = document.querySelectorAll('.hero-slide');
             const deviceType = getDeviceType();
             
-            slides.forEach((slide, index) => {
+            slideElements.forEach((slide) => {
                 const imageUrl = slide.getAttribute(`data-${deviceType}`);
                 if (imageUrl) {
                     slide.style.backgroundImage = `url('${imageUrl}?v=${Date.now()}')`;
@@ -770,151 +771,134 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load appropriate images on page load
-            updateHeroImages();
+        function showSlide(n) {
+            if (!slides || slides.length === 0) return;
 
-            let currentSlideIndex = 0;
-            const slides = document.querySelectorAll('.hero-slide');
-            const indicators = document.querySelectorAll('.indicator');
-            const totalSlides = slides.length;
-            let autoSlideTimer;
-
-            console.log('Hero slides found:', totalSlides);
-
-            function showSlide(n) {
-                slides.forEach(slide => slide.classList.remove('active'));
-                indicators.forEach(indicator => indicator.classList.remove('active'));
-                
-                if (slides[n]) {
-                    slides[n].classList.add('active');
-                }
-                if (indicators[n]) {
-                    indicators[n].classList.add('active');
-                }
-            }
-
-            function startAutoSlide() {
-                autoSlideTimer = setTimeout(() => {
-                    currentSlideIndex++;
-                    if (currentSlideIndex >= totalSlides) {
-                        currentSlideIndex = 0;
-                    }
-                    console.log('Auto sliding to:', currentSlideIndex);
-                    showSlide(currentSlideIndex);
-                    startAutoSlide();
-                }, 5000); // Change slide every 5 seconds
-            }
-
-            function changeSlide(n) {
-                clearTimeout(autoSlideTimer);
-                currentSlideIndex += n;
-                if (currentSlideIndex >= totalSlides) {
-                    currentSlideIndex = 0;
-                } else if (currentSlideIndex < 0) {
-                    currentSlideIndex = totalSlides - 1;
-                }
-                showSlide(currentSlideIndex);
-                startAutoSlide();
-            }
-
-            function currentSlide(n) {
-                clearTimeout(autoSlideTimer);
+            // Wrap around
+            if (n >= totalSlides) {
+                currentSlideIndex = 0;
+            } else if (n < 0) {
+                currentSlideIndex = totalSlides - 1;
+            } else {
                 currentSlideIndex = n;
-                showSlide(currentSlideIndex);
-                startAutoSlide();
             }
 
-            // Initialize first slide
-            if (slides.length > 0) {
+            // Remove active class
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+
+            // Add active class
+            if (slides[currentSlideIndex]) {
+                slides[currentSlideIndex].classList.add('active');
+            }
+            if (indicators[currentSlideIndex]) {
+                indicators[currentSlideIndex].classList.add('active');
+            }
+
+            console.log('Hero slide:', currentSlideIndex);
+        }
+
+        function autoSlide() {
+            if (totalSlides > 0) {
+                currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        function startAutoSlide() {
+            if (autoSlideTimer) clearInterval(autoSlideTimer);
+            autoSlideTimer = setInterval(autoSlide, 5000);
+            console.log('Auto slide started');
+        }
+
+        function stopAutoSlide() {
+            if (autoSlideTimer) {
+                clearInterval(autoSlideTimer);
+                autoSlideTimer = null;
+            }
+        }
+
+        function changeSlide(n) {
+            stopAutoSlide();
+            showSlide(currentSlideIndex + n);
+            startAutoSlide();
+        }
+
+        function currentSlide(n) {
+            stopAutoSlide();
+            showSlide(n);
+            startAutoSlide();
+        }
+
+        // Initialize hero slider
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing hero slider...');
+            
+            slides = document.querySelectorAll('.hero-slide');
+            indicators = document.querySelectorAll('.indicator');
+            totalSlides = slides.length;
+
+            console.log('Total slides:', totalSlides);
+
+            if (totalSlides > 0) {
+                updateHeroImages();
                 showSlide(0);
                 startAutoSlide();
             }
 
-            // Make functions globally accessible
-            window.changeSlide = changeSlide;
-            window.currentSlide = currentSlide;
+            window.addEventListener('resize', updateHeroImages);
 
-            // Update images on window resize
-            window.addEventListener('resize', function() {
-                updateHeroImages();
-            });
+            // Initialize dynamic text styling and start rotation
+            const heroDynamicElement = document.getElementById('heroDynamicText');
+            if (heroDynamicElement) {
+                heroDynamicElement.style.transition = 'opacity 0.6s ease-in-out';
+                startDynamicTextRotation();
+            }
         });
 
-            // Make functions globally accessible
-            window.changeSlide = changeSlide;
-            window.currentSlide = currentSlide;
-        });
+        // ================================================
+        // HERO DYNAMIC TEXT - Independent of Slider
+        // ================================================
+        const dynamicTexts = ['LUXURY', 'ELEGANCE', 'FRAGRANCE'];
+        let dynamicTextIndex = 0;
+        let dynamicTextTimer;
 
-        // Reviews Carousel Slider
-        const reviewsCarousel = document.getElementById('reviewsCarousel');
-        const reviewItems = document.querySelectorAll('.review-card-item');
-        const itemsPerSlide = 4;
-        let currentSlide = 0;
-        let carouselAutoSlideTimer;
-
-        function getItemsPerSlide() {
-            if (window.innerWidth <= 480) return 1;
-            if (window.innerWidth <= 768) return 2;
-            if (window.innerWidth <= 1200) return 3;
-            return 4;
-        }
-
-        function updateCarouselPosition() {
-            const itemsToShow = getItemsPerSlide();
-            const itemWidth = 100 / itemsToShow;
-            const translateX = -currentSlide * itemWidth;
-            reviewsCarousel.style.transform = `translateX(${translateX}%)`;
+        function updateDynamicText() {
+            const heroDynamicElement = document.getElementById('heroDynamicText');
             
-            // Update indicators
-            const totalSlides = Math.ceil(reviewItems.length / itemsToShow);
-            document.querySelectorAll('.carousel-indicator').forEach((indicator, index) => {
-                indicator.classList.toggle('active', index === currentSlide);
-            });
+            if (!heroDynamicElement) return;
+
+            // Fade out
+            heroDynamicElement.style.opacity = '0';
+
+            setTimeout(() => {
+                // Move to next text
+                dynamicTextIndex = (dynamicTextIndex + 1) % dynamicTexts.length;
+                
+                // Change text
+                heroDynamicElement.textContent = dynamicTexts[dynamicTextIndex];
+                
+                // Fade in
+                heroDynamicElement.style.opacity = '1';
+                console.log('Hero text changed to:', dynamicTexts[dynamicTextIndex]);
+            }, 300);
         }
 
-        function nextReviewCarousel() {
-            const itemsToShow = getItemsPerSlide();
-            const maxSlide = Math.ceil(reviewItems.length / itemsToShow) - 1;
-            currentSlide = (currentSlide + 1) % (maxSlide + 1);
-            updateCarouselPosition();
-            clearTimeout(carouselAutoSlideTimer);
-            startCarouselAutoSlide();
+        function startDynamicTextRotation() {
+            if (dynamicTextTimer) clearInterval(dynamicTextTimer);
+            dynamicTextTimer = setInterval(updateDynamicText, 3000); // Change text every 3 seconds
+            console.log('Dynamic text rotation started');
         }
 
-        function prevReviewCarousel() {
-            const itemsToShow = getItemsPerSlide();
-            const maxSlide = Math.ceil(reviewItems.length / itemsToShow) - 1;
-            currentSlide = (currentSlide - 1 + maxSlide + 1) % (maxSlide + 1);
-            updateCarouselPosition();
-            clearTimeout(carouselAutoSlideTimer);
-            startCarouselAutoSlide();
+        function stopDynamicTextRotation() {
+            if (dynamicTextTimer) {
+                clearInterval(dynamicTextTimer);
+                dynamicTextTimer = null;
+            }
         }
+    </script>
 
-        function goToCarouselSlide(index) {
-            currentSlide = index;
-            updateCarouselPosition();
-            clearTimeout(carouselAutoSlideTimer);
-            startCarouselAutoSlide();
-        }
-
-        function startCarouselAutoSlide() {
-            carouselAutoSlideTimer = setTimeout(() => {
-                nextReviewCarousel();
-            }, 5000);
-        }
-
-        // Initialize carousel
-        if (reviewItems.length > 0) {
-            updateCarouselPosition();
-            startCarouselAutoSlide();
-            
-            // Update on window resize
-            window.addEventListener('resize', updateCarouselPosition);
-        }
-<<<<<<< HEAD
-
-        // Add to Cart Function
+    <script>
         function addToCart(productId, productName, productPrice, productImage) {
             // Validate inputs
             if (!productId || !productName || !productPrice || !productImage) {
@@ -949,7 +933,6 @@
             }
         }
 
-        // Initialize Add to Cart Button Listeners
         // Initialize Add to Cart Button Listeners  
         let addToCartListenerAttached = false;
         
@@ -987,7 +970,7 @@
                 addToCart(productId, productName, productPrice, productImage);
                 
                 // Re-enable button after 1.5 seconds
-                setTimeout(() => {
+                setTimeout(function() {
                     button.removeAttribute('data-adding-to-cart');
                     button.disabled = false;
                 }, 1500);
@@ -1010,23 +993,20 @@
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.className = 'cart-notification';
-            notification.innerHTML = `
-                <i class="fas fa-check-circle"></i>
-                <span>${message}</span>
-            `;
+            notification.innerHTML = '<i class="fas fa-check-circle"></i><span>' + message + '</span>';
             document.body.appendChild(notification);
 
-            setTimeout(() => {
+            setTimeout(function() {
                 notification.classList.add('show');
             }, 10);
 
-            setTimeout(() => {
+            setTimeout(function() {
                 notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
+                setTimeout(function() {
+                    notification.remove();
+                }, 300);
             }, 2000);
         }
-=======
->>>>>>> 405926278d214507de98524ce7e136870e96aa0e
     </script>
 
 

@@ -41,6 +41,15 @@
                 </a>
             </div>
             <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.attar-page.*') ? 'active' : '' }}"
+                    href="{{ route('admin.attar-page.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('Attar Page') }}</span>
+                </a>
+            </div>
+            <div class="menu-item">
                 <a class="menu-link {{ request()->routeIs('admin.about-page.*') ? 'active' : '' }}"
                     href="{{ route('admin.about-page.index') }}">
                     <span class="menu-bullet">
@@ -68,12 +77,12 @@
                 </a>
             </div>
             <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}"
-                    href="{{ route('admin.reviews.index') }}">
+                <a class="menu-link {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}"
+                    href="{{ route('admin.messages.index') }}">
                     <span class="menu-bullet">
                         <span class="bullet bullet-dot"></span>
                     </span>
-                    <span class="menu-title">{{ __('Reviews') }}</span>
+                    <span class="menu-title">{{ __('Messages') }}</span>
                 </a>
             </div>
         </div>

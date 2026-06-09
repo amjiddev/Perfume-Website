@@ -38,10 +38,6 @@
                             @endif
                         </div>
 
-                        <p class="product-short-description">
-                            {{ $product['description'] ?? 'Premium fragrance' }}
-                        </p>
-
                         <div class="product-quick-actions">
                             <div class="quantity-control">
                                 <button class="qty-btn-minus" onclick="decreaseQtyDetail()">-</button>
@@ -139,7 +135,7 @@
                                 @endif
                             </div>
                             <h5>{{ $relatedProduct['name'] ?? 'Product' }}</h5>
-                            <p class="product-description">{{ $relatedProduct['description'] ?? '' }}</p>
+                            <p class="product-description">{{ implode(' ', array_slice(explode(' ', $relatedProduct['description'] ?? ''), 0, 3)) }}...</p>
                             <div class="product-footer">
                                 <div class="price-section">
                                     @if (($relatedProduct['price'] ?? 0) > 0)
