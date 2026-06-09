@@ -14,7 +14,6 @@
                             ['label' => 'Home', 'url' => 'home'],
                             ['label' => 'Shop', 'url' => 'shop'],
                             ['label' => 'About', 'url' => 'about'],
-                            ['label' => 'Contact', 'url' => 'contact'],
                         ];
                     @endphp
                     @foreach($quickLinks as $link)
@@ -27,10 +26,9 @@
                 <ul class="list-unstyled">
                     @php
                         $serviceLinks = $footerSettings->customer_service_links ?? [
-                            ['label' => 'Shipping Info', 'url' => '#'],
-                            ['label' => 'Returns', 'url' => '#'],
-                            ['label' => 'FAQ', 'url' => '#'],
                             ['label' => 'Privacy Policy', 'url' => '#'],
+                            ['label' => 'Terms & Conditions', 'url' => '#'],
+                            ['label' => 'Disclaimer', 'url' => '#'],
                         ];
                     @endphp
                     @foreach($serviceLinks as $link)
@@ -46,8 +44,7 @@
                             $socialLinks = $footerSettings->social_links ?? [
                                 ['icon' => 'facebook', 'label' => 'Facebook', 'url' => '#'],
                                 ['icon' => 'instagram', 'label' => 'Instagram', 'url' => '#'],
-                                ['icon' => 'twitter', 'label' => 'Twitter', 'url' => '#'],
-                                ['icon' => 'linkedin', 'label' => 'LinkedIn', 'url' => '#'],
+                                ['icon' => 'tiktok', 'label' => 'TikTok', 'url' => '#'],
                             ];
                         @endphp
                         @foreach($socialLinks as $social)

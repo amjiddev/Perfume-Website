@@ -223,6 +223,26 @@
     <script src="{{ asset('frontend/js/cart-utils.js') }}"></script>
     
     <script>
+        // ===== GLOBAL CART DRAWER FUNCTION - MUST BE FIRST =====
+        function openCartDrawer(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const drawer = document.getElementById('cartDrawer');
+            if (drawer) {
+                drawer.classList.add('open');
+                console.log('✅ CART DRAWER OPENED');
+            } else {
+                console.error('❌ Cart drawer element not found');
+            }
+            return false;
+        }
+
+        // Make it globally accessible
+        window.openCartDrawer = openCartDrawer;
+        console.log('🛒 openCartDrawer function ready');
+
         // Promo Banner Slider
         let currentPromoIndex = 0;
         const promoSlides = document.querySelectorAll('.promo-slide');
@@ -333,6 +353,11 @@
             },
 
             setupCartEvents() {
+                // DISABLED - Using direct onclick instead
+                // The old cloneNode approach was removing custom onclick handlers
+                return;
+                
+                /*
                 // Setup desktop cart icon
                 const cartLink = document.querySelector('.navbar-cart-link:not(.navbar-cart-link-mobile)');
                 if (cartLink) {
@@ -356,6 +381,7 @@
                         this.toggleCartDrawer();
                     });
                 }
+                */
             },
 
             toggleCartDrawer() {
