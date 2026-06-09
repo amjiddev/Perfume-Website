@@ -95,31 +95,36 @@
                         <p class="text-muted mb-4">{{ $contactPage->contact_form_description }}</p>
                         @endif
 
-                        <form class="contact-form" id="contactForm">
+                        <form class="contact-form" id="contactForm" novalidate>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="name" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+                                    <small class="text-danger d-none" id="nameError">Full name can only contain alphabetic characters and spaces</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="email_form" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="email_form" name="email" required>
+                                    <label for="email_form" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email_form" name="email" placeholder="Enter your email" required>
+                                    <small class="text-danger d-none" id="emailError">Please enter a valid email address</small>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="phone_form" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone_form" name="phone">
+                                <label for="phone_form" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone_form" name="phone" placeholder="Enter your phone number" required>
+                                <small class="text-danger d-none" id="phoneError">Phone number must contain only digits and be at least 10 digits long</small>
                             </div>
 
                             <div class="mb-3">
-                                <label for="subject" class="form-label">Subject</label>
-                                <input type="text" class="form-control" id="subject" name="subject" required>
+                                <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="subject" name="subject" placeholder="Enter subject" required>
+                                <small class="text-danger d-none" id="subjectError">Subject is required</small>
                             </div>
 
                             <div class="mb-3">
-                                <label for="message" class="form-label">Message</label>
-                                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                                <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="message" name="message" rows="5" placeholder="Enter your message" required></textarea>
+                                <small class="text-danger d-none" id="messageError">Message is required</small>
                             </div>
 
                             <button type="submit" class="btn-primary-custom w-100">
@@ -239,6 +244,31 @@
             outline: none;
         }
 
+        .contact-form .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: none;
+        }
+
+        .contact-form .form-control.is-invalid:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .contact-form small.text-danger {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .contact-form .form-label .text-danger {
+            color: #dc3545;
+            margin-left: 0.2rem;
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
         .map-container {
             width: 100%;
             height: 500px;
@@ -282,23 +312,136 @@
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Clear all error messages
+            clearAllErrors();
+            
             // Get form data
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email_form').value,
-                phone: document.getElementById('phone_form').value,
-                subject: document.getElementById('subject').value,
-                message: document.getElementById('message').value,
-            };
-
-            // Here you can send the data to your backend
-            console.log('Form submitted:', formData);
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email_form').value.trim();
+            const phone = document.getElementById('phone_form').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
             
-            // Show success message
-            alert('Thank you for your message! We will get back to you soon.');
+            let isValid = true;
             
-            // Reset form
-            this.reset();
+            // Validate Full Name - only alphabetic characters and spaces
+            if (!name) {
+                showError('nameError', 'Full name is required');
+                isValid = false;
+            } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+                showError('nameError', 'Full name can only contain alphabetic characters and spaces');
+                isValid = false;
+            }
+            
+            // Validate Email - proper email format
+            if (!email) {
+                showError('emailError', 'Email address is required');
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError('emailError', 'Please enter a valid email address');
+                isValid = false;
+            }
+            
+            // Validate Phone Number - only digits, at least 10 digits
+            if (!phone) {
+                showError('phoneError', 'Phone number is required');
+                isValid = false;
+            } else if (!/^\d{10,}$/.test(phone.replace(/\s/g, ''))) {
+                showError('phoneError', 'Phone number must contain only digits and be at least 10 digits long');
+                isValid = false;
+            }
+            
+            // Validate Subject
+            if (!subject) {
+                showError('subjectError', 'Subject is required');
+                isValid = false;
+            }
+            
+            // Validate Message
+            if (!message) {
+                showError('messageError', 'Message is required');
+                isValid = false;
+            }
+            
+            if (isValid) {
+                // All validations passed
+                const formData = {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    subject: subject,
+                    message: message,
+                };
+                
+                console.log('Form submitted with valid data:', formData);
+                
+                // Here you can send the data to your backend
+                // For now, show success message
+                alert('Thank you for your message! We will get back to you soon.');
+                
+                // Reset form
+                document.getElementById('contactForm').reset();
+                clearAllErrors();
+            }
+        });
+        
+        // Helper function to show error message
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.remove('d-none');
+            }
+        }
+        
+        // Helper function to clear all errors
+        function clearAllErrors() {
+            const errorElements = document.querySelectorAll('[id$="Error"]');
+            errorElements.forEach(element => {
+                element.classList.add('d-none');
+                element.textContent = '';
+            });
+        }
+        
+        // Real-time validation on input change
+        document.getElementById('name').addEventListener('blur', function() {
+            const name = this.value.trim();
+            const errorElement = document.getElementById('nameError');
+            
+            if (name && !/^[a-zA-Z\s]+$/.test(name)) {
+                showError('nameError', 'Full name can only contain alphabetic characters and spaces');
+                this.classList.add('is-invalid');
+            } else {
+                errorElement.classList.add('d-none');
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        document.getElementById('email_form').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const errorElement = document.getElementById('emailError');
+            
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError('emailError', 'Please enter a valid email address');
+                this.classList.add('is-invalid');
+            } else {
+                errorElement.classList.add('d-none');
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        document.getElementById('phone_form').addEventListener('blur', function() {
+            const phone = this.value.trim();
+            const errorElement = document.getElementById('phoneError');
+            const digitsOnly = phone.replace(/\s/g, '');
+            
+            if (phone && !/^\d{10,}$/.test(digitsOnly)) {
+                showError('phoneError', 'Phone number must contain only digits and be at least 10 digits long');
+                this.classList.add('is-invalid');
+            } else {
+                errorElement.classList.add('d-none');
+                this.classList.remove('is-invalid');
+            }
         });
     </script>
 @endsection
