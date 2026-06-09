@@ -24,4 +24,14 @@ Route::get('/product/{id}', [PerfumeController::class, 'productDetail'])->name('
 Route::get('/checkout', [PerfumeController::class, 'checkout'])->name('checkout');
 Route::get('/about', [PerfumeController::class, 'about'])->name('about');
 Route::get('/contact', [PerfumeController::class, 'contact'])->name('contact');
-Route::post('/contact/submit', [\App\Http\Controllers\Apps\ContactMessageController::class, 'store'])->name('contact.submit');
+
+// Legal Pages
+Route::get('/privacy-policy', function () {
+    return view('frontend.privacy-policy');
+})->name('privacy-policy');
+Route::get('/terms-and-conditions', function () {
+    return view('frontend.terms-and-conditions');
+})->name('terms-and-conditions');
+Route::get('/disclaimer', function () {
+    return view('frontend.disclaimer');
+})->name('disclaimer');

@@ -7,7 +7,7 @@
         
         <div class="navbar-right-section">
             <!-- Mobile Cart Icon - Show only on mobile -->
-            <a href="#" class="navbar-cart-link navbar-cart-link-mobile" title="View Cart">
+            <a href="#" class="navbar-cart-link navbar-cart-link-mobile" title="View Cart" onclick="openCartDrawer(event); return false;">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-badge" id="cartBadgeMobile" style="display: none;">0</span>
             </a>
@@ -39,7 +39,7 @@
                 </li>
             </ul>
             <div class="navbar-icons navbar-icons-desktop">
-                <a href="#" class="navbar-cart-link" title="View Cart">
+                <a href="#" class="navbar-cart-link" title="View Cart" onclick="openCartDrawer(event); return false;">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
                 </a>
