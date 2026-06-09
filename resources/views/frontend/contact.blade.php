@@ -111,8 +111,8 @@
 
                             <div class="mb-3">
                                 <label for="phone_form" class="form-label">Phone Number <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="phone_form" name="phone" placeholder="Enter your phone number" required>
-                                <small class="text-danger d-none" id="phoneError">Phone number must contain only digits and be at least 10 digits long</small>
+                                <input type="tel" class="form-control" id="phone_form" name="phone" placeholder="+1 (412) 804-2971" required>
+                                <small class="text-danger d-none" id="phoneError">Phone number must contain 10-14 digits (format: +1 (412) 804-2971)</small>
                             </div>
 
                             <div class="mb-3">
@@ -342,13 +342,17 @@
                 isValid = false;
             }
             
-            // Validate Phone Number - only digits, at least 10 digits
+            // Validate Phone Number - 10-14 digits, accepts formatted numbers
             if (!phone) {
                 showError('phoneError', 'Phone number is required');
                 isValid = false;
-            } else if (!/^\d{10,}$/.test(phone.replace(/\s/g, ''))) {
-                showError('phoneError', 'Phone number must contain only digits and be at least 10 digits long');
-                isValid = false;
+            } else {
+                // Remove all non-digit characters to count digits
+                const digitsOnly = phone.replace(/\D/g, '');
+                if (!/^\d{10,14}$/.test(digitsOnly)) {
+                    showError('phoneError', 'Phone number must contain 10-14 digits (format: +1 (412) 804-2971)');
+                    isValid = false;
+                }
             }
             
             // Validate Subject
@@ -364,24 +368,50 @@
             }
             
             if (isValid) {
-                // All validations passed
+                // All validations passed - submit to backend
                 const formData = {
                     name: name,
                     email: email,
                     phone: phone,
                     subject: subject,
                     message: message,
+                    _token: document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
                 };
                 
-                console.log('Form submitted with valid data:', formData);
+                // Show loading state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
                 
-                // Here you can send the data to your backend
-                // For now, show success message
-                alert('Thank you for your message! We will get back to you soon.');
-                
-                // Reset form
-                document.getElementById('contactForm').reset();
-                clearAllErrors();
+                fetch('{{ route("contact.submit") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': formData._token
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    
+                    if (data.success) {
+                        alert(data.message);
+                        document.getElementById('contactForm').reset();
+                        clearAllErrors();
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to send message'));
+                    }
+                })
+                .catch(error => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    console.error('Error:', error);
+                    alert('Error submitting message. Please try again.');
+                });
             }
         });
         
@@ -433,10 +463,10 @@
         document.getElementById('phone_form').addEventListener('blur', function() {
             const phone = this.value.trim();
             const errorElement = document.getElementById('phoneError');
-            const digitsOnly = phone.replace(/\s/g, '');
+            const digitsOnly = phone.replace(/\D/g, '');
             
-            if (phone && !/^\d{10,}$/.test(digitsOnly)) {
-                showError('phoneError', 'Phone number must contain only digits and be at least 10 digits long');
+            if (phone && !/^\d{10,14}$/.test(digitsOnly)) {
+                showError('phoneError', 'Phone number must contain 10-14 digits (format: +1 (412) 804-2971)');
                 this.classList.add('is-invalid');
             } else {
                 errorElement.classList.add('d-none');

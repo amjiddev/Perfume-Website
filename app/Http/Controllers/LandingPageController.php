@@ -16,7 +16,6 @@ use App\Models\PerfumePage;
 use App\Models\Product;
 use App\Models\RepairService;
 use App\Models\RepairServiceSubPage;
-use App\Models\Review;
 use App\Models\ShopPage;
 use App\Traits\UploadImageTrait;
 use Exception;
@@ -205,11 +204,6 @@ class LandingPageController extends Controller
             ->where('is_featured', true)
             ->orderBy('reviews_count', 'desc')
             ->limit(3)
-            ->get();
-        
-        // Get reviews for home page
-        $reviews = \App\Models\Review::whereIn('display_section', ['home', 'both'])
-            ->orderBy('created_at', 'desc')
             ->get();
         
         // Get guest gifts

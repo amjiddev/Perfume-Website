@@ -105,14 +105,6 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    @php
-        $reviews = \App\Models\Review::where('display_section', 'about')->get();
-    @endphp
-    @if($reviews->count() > 0)
-        @include('frontend.components.testimonials-section', ['reviews' => $reviews])
-    @endif
-
     <style>
         .page-content {
             padding: 4rem 0;

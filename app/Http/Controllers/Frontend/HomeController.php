@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Perfume;
 use App\Models\PerfumePage;
-use App\Models\Review;
 
 class HomeController extends Controller
 {
@@ -29,11 +28,6 @@ class HomeController extends Controller
             ->limit(3)
             ->get();
         
-        // Get reviews for home page
-        $reviews = Review::whereIn('display_section', ['home', 'both'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
         // Get guest gifts
         $guestGifts = \App\Models\GuestGift::where('is_active', true)->get();
         
@@ -54,7 +48,7 @@ class HomeController extends Controller
             ]
         ]);
         
-        return view('frontend.home', compact('shopPage', 'products', 'perfumePage', 'bestSellers', 'reviews', 'guestGifts', 'homePage'));
+        return view('frontend.home', compact('shopPage', 'products', 'perfumePage', 'bestSellers', 'guestGifts', 'homePage'));
     }
 }
 
