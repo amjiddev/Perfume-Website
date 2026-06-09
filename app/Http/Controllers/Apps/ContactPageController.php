@@ -64,4 +64,30 @@ class ContactPageController extends Controller
 
         return redirect()->back()->with('success', 'Contact page updated successfully!');
     }
+
+    public function deleteImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'image_field' => 'required|in:hero_image',
+            ]);
+
+            $imageField = $request->input('image_field');
+            $contactPage = ContactPage::first();
+
+            if (!$contactPage) {
+                return response()->json(['success' => false, 'message' => 'Contact page not found']);
+            }
+
+            $imagePath = $contactPage->$imageField;
+            if ($imagePath && file_exists(public_path($imagePath))) {
+                unlink(public_path($imagePath));
+            }
+
+            $contactPage->update([$imageField => null]);
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Unable to delete image']);
+        }
+    }
 }

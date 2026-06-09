@@ -305,6 +305,7 @@
 
             updateBadge() {
                 const badge = document.getElementById('cartBadge');
+                const badgeMobile = document.getElementById('cartBadgeMobile');
                 const drawerBadge = document.getElementById('drawerBadge');
                 const total = this.getTotalItems();
                 
@@ -317,20 +318,40 @@
                     }
                 }
 
+                if (badgeMobile) {
+                    if (total > 0) {
+                        badgeMobile.textContent = total;
+                        badgeMobile.style.display = 'flex';
+                    } else {
+                        badgeMobile.style.display = 'none';
+                    }
+                }
+
                 if (drawerBadge) {
                     drawerBadge.textContent = total;
                 }
             },
 
             setupCartEvents() {
-                const cartLink = document.querySelector('.navbar-cart-link');
+                // Setup desktop cart icon
+                const cartLink = document.querySelector('.navbar-cart-link:not(.navbar-cart-link-mobile)');
                 if (cartLink) {
-                    // Remove old listener by cloning and replacing
                     const newCartLink = cartLink.cloneNode(true);
                     cartLink.parentNode.replaceChild(newCartLink, cartLink);
                     
-                    // Add fresh listener
                     newCartLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.toggleCartDrawer();
+                    });
+                }
+
+                // Setup mobile cart icon
+                const cartLinkMobile = document.querySelector('.navbar-cart-link-mobile');
+                if (cartLinkMobile) {
+                    const newCartLinkMobile = cartLinkMobile.cloneNode(true);
+                    cartLinkMobile.parentNode.replaceChild(newCartLinkMobile, cartLinkMobile);
+                    
+                    newCartLinkMobile.addEventListener('click', (e) => {
                         e.preventDefault();
                         this.toggleCartDrawer();
                     });
@@ -437,9 +458,12 @@
         document.addEventListener('click', function(e) {
             const drawer = document.getElementById('cartDrawer');
             const cartLink = document.querySelector('.navbar-cart-link');
+            const cartLinkMobile = document.querySelector('.navbar-cart-link-mobile');
             
-            // Only close if clicking outside the drawer and cart link
-            if (drawer && !drawer.contains(e.target) && !cartLink.contains(e.target)) {
+            // Only close if clicking outside the drawer and both cart links
+            if (drawer && !drawer.contains(e.target) && 
+                (!cartLink || !cartLink.contains(e.target)) && 
+                (!cartLinkMobile || !cartLinkMobile.contains(e.target))) {
                 drawer.classList.remove('open');
             }
         });

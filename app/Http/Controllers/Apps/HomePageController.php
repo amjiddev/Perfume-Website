@@ -36,6 +36,12 @@ class HomePageController extends Controller
             'hero_subheading' => 'required|string',
             'hero_image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'hero_image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_1_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_1_tablet' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_1_laptop' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_2_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_2_tablet' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_2_laptop' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'about_heading' => 'required|string|max:255',
             'about_description' => 'required|string',
             'about_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -94,6 +100,29 @@ class HomePageController extends Controller
                 $validated['about_image'] = 'uploads/home-page/' . $filename;
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', 'Error uploading about image: ' . $e->getMessage());
+            }
+        }
+
+        // Handle responsive hero images
+        $responsiveImageFields = [
+            'hero_image_1_mobile', 'hero_image_1_tablet', 'hero_image_1_laptop',
+            'hero_image_2_mobile', 'hero_image_2_tablet', 'hero_image_2_laptop'
+        ];
+
+        foreach ($responsiveImageFields as $field) {
+            if ($request->hasFile($field)) {
+                try {
+                    if ($homePage->$field && file_exists(public_path($homePage->$field))) {
+                        unlink(public_path($homePage->$field));
+                    }
+                    
+                    $file = $request->file($field);
+                    $filename = str_replace('_', '-', $field) . '-' . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/home-page'), $filename);
+                    $validated[$field] = 'uploads/home-page/' . $filename;
+                } catch (\Exception $e) {
+                    return redirect()->back()->with('error', "Error uploading $field: " . $e->getMessage());
+                }
             }
         }
 

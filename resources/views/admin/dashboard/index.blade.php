@@ -405,7 +405,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #000000;
         padding: 1rem 2rem;
         border-radius: 0;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
@@ -504,7 +504,7 @@
     }
 
     .profile-dropdown .dropdown-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background:#000000;
         color: white;
         border-radius: 8px 8px 0 0;
         padding: 1rem;
@@ -565,24 +565,26 @@
         align-items: center;
         padding: 1.5rem;
         border-bottom: 1px solid #eee;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: #000000;
+        color: #ffffff !important;
         border-radius: 12px 12px 0 0;
     }
 
     .notification-header h6 {
         margin: 0;
         font-weight: 700;
+        color: #ffffff !important;
     }
 
-    .close-btn {
+    .notification-header .close-btn {
+        color: #ffffff !important;
         font-size: 1.5rem;
         cursor: pointer;
         opacity: 0.7;
         transition: opacity 0.2s;
     }
 
-    .close-btn:hover {
+    .notification-header .close-btn:hover {
         opacity: 1;
     }
 

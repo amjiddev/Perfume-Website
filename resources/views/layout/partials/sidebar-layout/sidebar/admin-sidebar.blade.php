@@ -1,8 +1,4 @@
-<div class="menu-item pt-5">
-    <div class="menu-content">
-        <span class="menu-heading fw-bold text-uppercase fs-7">Website</span>
-    </div>
-</div>
+
 <div class="menu menu-column menu-rounded menu-sub-indention px-3 fw-semibold fs-6" id="#kt_app_sidebar_menu"
     data-kt-menu="true" data-kt-menu-expand="false">
     <!--begin:Menu item-->

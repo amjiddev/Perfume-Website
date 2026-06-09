@@ -138,6 +138,46 @@ class ShopPageController extends Controller
         return back()->with('success', 'Product updated successfully!');
     }
 
+    public function deleteImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'image_field' => 'required|in:hero_image',
+            ]);
+
+            $imageField = $request->input('image_field');
+            $shopPage = ShopPage::first();
+
+            if (!$shopPage) {
+                return response()->json(['success' => false, 'message' => 'Shop page not found']);
+            }
+
+            $imagePath = $shopPage->$imageField;
+            if ($imagePath && file_exists(public_path($imagePath))) {
+                unlink(public_path($imagePath));
+            }
+
+            $shopPage->update([$imageField => null]);
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Unable to delete image']);
+        }
+    }
+
+    public function deleteProductImage(Request $request, Product $product)
+    {
+        try {
+            if ($product->image && file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
+            }
+
+            $product->update(['image' => null]);
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Unable to delete image']);
+        }
+    }
+
     public function deleteProduct(Product $product)
     {
         if ($product->image && file_exists(public_path($product->image))) {

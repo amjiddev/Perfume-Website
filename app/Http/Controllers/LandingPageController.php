@@ -153,6 +153,40 @@ class LandingPageController extends Controller
         }
     }
 
+    public function deleteImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'image_field' => 'required|in:hero_image_1,hero_image_2,about_image',
+            ]);
+
+            $imageField = $request->input('image_field');
+            $homePage = \App\Models\HomePage::first();
+
+            if (!$homePage) {
+                return response()->json(['success' => false, 'message' => 'Home page not found']);
+            }
+
+            // Get the current image path
+            $imagePath = $homePage->$imageField;
+
+            if ($imagePath && file_exists(public_path($imagePath))) {
+                unlink(public_path($imagePath));
+            }
+
+            // Update the image field to null
+            $homePage->update([$imageField => null]);
+
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $e) {
+            Log::error('Delete image error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json(['success' => false, 'message' => 'Unable to delete image']);
+        }
+    }
+
     public function landingPage()
     {
         $shopPage = \App\Models\ShopPage::first();
