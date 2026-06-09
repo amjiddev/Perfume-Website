@@ -29,7 +29,7 @@
                         </div>
                         <div class="product-info">
                             <h5>{{ $perfume->name }}</h5>
-                            <p class="product-desc">{{ $perfume->description }}</p>
+                            <p class="product-desc">{{ implode(' ', array_slice(explode(' ', $perfume->description), 0, 3)) }}...</p>
                             <div class="rating-perfume">
                                 @for($i = 0; $i < floor($perfume->rating); $i++)
                                     <i class="fas fa-star" style="color: #FFD700;"></i>

@@ -51,9 +51,6 @@
                             <button class="btn-add-to-cart-detail" onclick="goToCheckout()">
                                 <i class="fas fa-shopping-cart"></i> Add to Cart
                             </button>
-                            <button class="btn-wishlist-detail" title="Add to Wishlist">
-                                <i class="far fa-heart"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -140,7 +137,6 @@
                                 @if (($relatedProduct['discount_percentage'] ?? 0) > 0)
                                     <span class="sale-badge">-{{ $relatedProduct['discount_percentage'] }}%</span>
                                 @endif
-                                <button class="wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
                             </div>
                             <h5>{{ $relatedProduct['name'] ?? 'Product' }}</h5>
                             <p class="product-description">{{ $relatedProduct['description'] ?? '' }}</p>
@@ -262,34 +258,8 @@
             }, 2000);
         }
 
-        // Wishlist button functionality
-        document.querySelectorAll('.btn-wishlist-detail').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const icon = this.querySelector('i');
-                if (this.classList.contains('active')) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                } else {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
-                }
-            });
-        });
+        // Wishlist button functionality removed
 
-        // Related products wishlist
-        document.querySelectorAll('.wishlist-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const icon = this.querySelector('i');
-                if (this.classList.contains('active')) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                } else {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
-                }
-            });
-        });
+        // Related products wishlist removed
     </script>
 @endsection
