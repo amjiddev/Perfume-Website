@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Mail\OrderConfirmation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderStoreController extends Controller
 {
@@ -40,6 +42,17 @@ class OrderStoreController extends Controller
                 'notes' => $validated['notes'] ?? null,
                 'status' => $validated['status'] ?? 'pending',
             ]);
+
+            // Email sending disabled - Gmail SMTP won't deliver from personal accounts
+            // Customers will see order confirmation on screen instead
+            /*
+            try {
+                Mail::to($order->email)->send(new OrderConfirmation($order));
+                \Log::info('Order confirmation email sent successfully to: ' . $order->email, ['order_id' => $order->id]);
+            } catch (\Exception $emailError) {
+                \Log::warning('Order email sending failed:', ['error' => $emailError->getMessage(), 'order_id' => $order->id]);
+            }
+            */
 
             return response()->json([
                 'success' => true,

@@ -22,10 +22,15 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
                 </li>
-                <li class="nav-item dropdown" onmouseenter="this.querySelector('.dropdown-menu').classList.add('show')" onmouseleave="this.querySelector('.dropdown-menu').classList.remove('show')">
-                    <a class="nav-link dropdown-toggle {{ request()->routeIs('shop') ? 'active' : '' }}" href="{{ route('shop') }}" id="shopDropdown" role="button" aria-expanded="false">
-                        Shop <i class="fas fa-chevron-down"></i>
-                    </a>
+                <li class="nav-item dropdown" id="shopDropdown">
+                    <div class="shop-dropdown-wrapper">
+                        <a class="nav-link shop-text {{ request()->routeIs('shop') ? 'active' : '' }}" href="{{ route('shop') }}" role="button">
+                            Shop
+                        </a>
+                        <a class="nav-link shop-dropdown-toggle" href="#" id="shopDropdownToggle" role="button" aria-expanded="false" onclick="toggleShopDropdown(event)">
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+                    </div>
                     <ul class="dropdown-menu" aria-labelledby="shopDropdown">
                         <li><a class="dropdown-item" href="{{ route('perfumes') }}">Perfumes</a></li>
                         <li><a class="dropdown-item" href="{{ route('attar') }}">Attar</a></li>
@@ -47,3 +52,67 @@
         </div>
     </div>
 </nav>
+
+<script>
+    // Shop Dropdown Management
+    const shopDropdown = document.getElementById('shopDropdown');
+    const shopDropdownMenu = shopDropdown ? shopDropdown.querySelector('.dropdown-menu') : null;
+    const shopDropdownToggle = shopDropdown ? shopDropdown.querySelector('.shop-dropdown-toggle') : null;
+    
+    function toggleShopDropdown(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        if (!shopDropdownMenu || !shopDropdownToggle) return;
+        
+        const isDesktop = window.innerWidth > 1024;
+        
+        // Only toggle on mobile/tablet
+        if (!isDesktop) {
+            const isOpen = shopDropdownMenu.classList.contains('show');
+            
+            if (isOpen) {
+                shopDropdownMenu.classList.remove('show');
+                shopDropdownToggle.classList.remove('active');
+            } else {
+                shopDropdownMenu.classList.add('show');
+                shopDropdownToggle.classList.add('active');
+            }
+        }
+    }
+    
+    // Desktop hover behavior
+    if (shopDropdown) {
+        shopDropdown.addEventListener('mouseenter', function() {
+            if (window.innerWidth > 1024 && shopDropdownMenu) {
+                shopDropdownMenu.classList.add('show');
+            }
+        });
+        
+        shopDropdown.addEventListener('mouseleave', function() {
+            if (window.innerWidth > 1024 && shopDropdownMenu) {
+                shopDropdownMenu.classList.remove('show');
+            }
+        });
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!shopDropdown) return;
+        
+        const isDesktop = window.innerWidth > 1024;
+        
+        // Only handle outside clicks on mobile/tablet
+        if (!isDesktop && !shopDropdown.contains(event.target)) {
+            if (shopDropdownMenu) shopDropdownMenu.classList.remove('show');
+            if (shopDropdownToggle) shopDropdownToggle.classList.remove('active');
+        }
+    });
+    
+    // Prevent menu from closing when clicking menu items on mobile
+    if (shopDropdownMenu) {
+        shopDropdownMenu.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    }
+</script>

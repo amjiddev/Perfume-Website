@@ -27,8 +27,8 @@ class AttarPageController extends Controller
     public function show($id)
     {
         $product = AttarProduct::findOrFail($id);
-        $relatedProducts = AttarProduct::where('type', $product->type)
-            ->where('id', '!=', $product->id)
+        // Get related products - show all except current product
+        $relatedProducts = AttarProduct::where('id', '!=', $product->id)
             ->orderBy('id', 'desc')
             ->limit(4)
             ->get();

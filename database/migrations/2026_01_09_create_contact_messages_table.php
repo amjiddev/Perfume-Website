@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contact_messages', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email');
-            $table->string('phone');
-            $table->string('subject');
-            $table->longText('message');
-            $table->boolean('is_read')->default(false);
-            $table->timestamps();
-            
-            // Index for faster queries
-            $table->index('is_read');
-            $table->index('created_at');
-        });
+        if (!Schema::hasTable('contact_messages')) {
+            Schema::create('contact_messages', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('email');
+                $table->string('phone');
+                $table->string('subject');
+                $table->longText('message');
+                $table->boolean('is_read')->default(false);
+                $table->timestamps();
+                
+                // Index for faster queries
+                $table->index('is_read');
+                $table->index('created_at');
+            });
+        }
     }
 
     /**
