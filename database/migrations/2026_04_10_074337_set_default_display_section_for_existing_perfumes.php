@@ -13,9 +13,11 @@ return new class extends Migration
     public function up(): void
     {
         // Set default display_section for existing perfumes
-        DB::table('perfumes')
-            ->whereNull('display_section')
-            ->update(['display_section' => 'both']);
+        if (Schema::hasTable('perfumes')) {
+            DB::table('perfumes')
+                ->whereNull('display_section')
+                ->update(['display_section' => 'both']);
+        }
     }
 
     /**
