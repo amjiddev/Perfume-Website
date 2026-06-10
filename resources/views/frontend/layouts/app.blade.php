@@ -76,7 +76,25 @@
             justify-content: center;
             padding: 0.1rem 1rem;
             gap: 0.5rem;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1031;
+            transition: transform 0.3s ease;
+        }
+        
+        .promo-banner-wrapper.hide {
+            transform: translateY(-100%);
+        }
+        
+        .promo-banner-wrapper.show {
+            transform: translateY(0);
+        }
+        
+        body {
+            padding-top: 100px;
         }
 
         .promo-nav-btn {
@@ -266,6 +284,27 @@
 
         // Auto-rotate promo banner every 5 seconds
         setInterval(nextPromo, 5000);
+
+        // ===== NAVBAR & PROMO BANNER HIDE/SHOW ON SCROLL =====
+        let lastScrollTop = 0;
+        const navbar = document.querySelector('.navbar');
+        const promoBanner = document.querySelector('.promo-banner-wrapper');
+
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop) {
+                // Scrolling DOWN - Hide both promo banner and navbar
+                if (promoBanner) promoBanner.classList.add('hide');
+                if (navbar) navbar.classList.add('hide');
+            } else {
+                // Scrolling UP - Show both promo banner and navbar
+                if (promoBanner) promoBanner.classList.remove('hide');
+                if (navbar) navbar.classList.remove('hide');
+            }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
 
         // Cart Management System
         const cartManager = {
