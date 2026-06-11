@@ -113,7 +113,7 @@ Perfume Page Settings
 </div>
 </td>
 <td>
-<button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editPerfumeModal{{ $perfume->id }}">Edit</button>
+<button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editPerfumeModal{{ $perfume->id }}" onclick="clearPerfumeErrors({{ $perfume->id }})">Edit</button>
 <form action="{{ route('admin.perfume-page.delete-perfume', $perfume) }}" method="POST" style="display: inline;">
 @csrf
 @method('DELETE')
@@ -254,10 +254,12 @@ Perfume Page Settings
 @error('price')
 <div class="invalid-feedback d-block">{{ $message }}</div>
 @enderror
+<div id="price_error_{{ $perfume->id }}" class="invalid-feedback d-block" style="display: none; color: #dc3545; font-size: 0.875em; margin-top: 0.25rem;"></div>
 </div>
 <div class="col-md-4 mb-3">
 <label for="original_price{{ $perfume->id }}" class="form-label">Original Price (Rs)</label>
 <input type="number" step="0.01" class="form-control" id="original_price{{ $perfume->id }}" name="original_price" value="{{ old('original_price', $perfume->original_price) }}">
+<div id="original_price_error_{{ $perfume->id }}" class="invalid-feedback d-block" style="display: none; color: #dc3545; font-size: 0.875em; margin-top: 0.25rem;"></div>
 </div>
 <div class="col-md-4 mb-3">
 <label for="discount_percentage{{ $perfume->id }}" class="form-label">Discount % (Auto)</label>
@@ -310,91 +312,143 @@ Perfume Page Settings
 </x-default-layout>
 @endsection
 <script>
+// Clear perfume errors when opening edit modal
+function clearPerfumeErrors(perfumeId) {
+    const priceInput = document.getElementById('price' + perfumeId);
+    const originalPriceInput = document.getElementById('original_price' + perfumeId);
+    const priceErrorDiv = document.getElementById('price_error_' + perfumeId);
+    const originalPriceErrorDiv = document.getElementById('original_price_error_' + perfumeId);
+
+    // Clear error states
+    if (priceInput) {
+        priceInput.classList.remove('is-invalid');
+    }
+    if (originalPriceInput) {
+        originalPriceInput.classList.remove('is-invalid');
+    }
+    if (priceErrorDiv) {
+        priceErrorDiv.style.display = 'none';
+        priceErrorDiv.textContent = '';
+    }
+    if (originalPriceErrorDiv) {
+        originalPriceErrorDiv.style.display = 'none';
+        originalPriceErrorDiv.textContent = '';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-const editForms = document.querySelectorAll('[id^="editPerfumeForm"]');
+    // Restore scroll position from sessionStorage
+    const savedScrollY = sessionStorage.getItem('scrollPosition');
+    if (savedScrollY) {
+        window.scrollTo(0, parseInt(savedScrollY));
+        sessionStorage.removeItem('scrollPosition');
+    }
 
-if (addForm) {
-addForm.addEventListener('submit', function(e) {
-if (!validateForm(this)) {
-e.preventDefault();
-e.stopPropagation();
-return false;
-}
+    // Get all edit forms
+    const editForms = document.querySelectorAll('[id^="editPerfumeForm"]');
+
+    editForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const priceInput = form.querySelector('input[name="price"]');
+            const originalPriceInput = form.querySelector('input[name="original_price"]');
+            const perfumeId = form.id.replace('editPerfumeForm', '');
+            const priceErrorDiv = document.getElementById('price_error_' + perfumeId);
+            const originalPriceErrorDiv = document.getElementById('original_price_error_' + perfumeId);
+            
+            const price = parseFloat(priceInput.value) || 0;
+            const originalPrice = parseFloat(originalPriceInput.value) || 0;
+
+            // Reset all errors
+            priceInput.classList.remove('is-invalid');
+            originalPriceInput.classList.remove('is-invalid');
+            priceErrorDiv.style.display = 'none';
+            priceErrorDiv.textContent = '';
+            originalPriceErrorDiv.style.display = 'none';
+            originalPriceErrorDiv.textContent = '';
+
+            // Validate: sale price must be less than original price (if original price is provided)
+            if (originalPrice > 0 && price >= originalPrice) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Show errors on both fields
+                priceInput.classList.add('is-invalid');
+                originalPriceInput.classList.add('is-invalid');
+                
+                priceErrorDiv.textContent = 'Sale price must be less than original price.';
+                priceErrorDiv.style.display = 'block';
+                
+                originalPriceErrorDiv.textContent = 'Original price must be greater than sale price.';
+                originalPriceErrorDiv.style.display = 'block';
+
+                // Keep modal open and scroll to error
+                priceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                priceInput.focus();
+
+                return false;
+            }
+        });
+    });
+
+    // Get add form and set up discount calculation
+    const addForm = document.getElementById('addPerfumeForm');
+    if (addForm) {
+        const priceInput = addForm.querySelector('input[name="price"]');
+        const originalPriceInput = addForm.querySelector('input[name="original_price"]');
+        const discountInput = addForm.querySelector('input[name="discount_percentage"]');
+
+        if (priceInput && originalPriceInput && discountInput) {
+            const calculateDiscount = () => {
+                const salePrice = parseFloat(priceInput.value) || 0;
+                const originalPrice = parseFloat(originalPriceInput.value) || 0;
+                if (originalPrice > 0 && salePrice > 0) {
+                    const discount = ((originalPrice - salePrice) / originalPrice) * 100;
+                    discountInput.value = Math.round(discount);
+                } else {
+                    discountInput.value = '';
+                }
+            };
+            originalPriceInput.addEventListener('input', calculateDiscount);
+            priceInput.addEventListener('input', calculateDiscount);
+        }
+    }
+
+    // Set up discount calculation for all edit forms
+    editForms.forEach(form => {
+        const priceInput = form.querySelector('input[name="price"]');
+        const originalPriceInput = form.querySelector('input[name="original_price"]');
+        const discountInput = form.querySelector('input[name="discount_percentage"]');
+
+        if (priceInput && originalPriceInput && discountInput) {
+            const calculateDiscount = () => {
+                const salePrice = parseFloat(priceInput.value) || 0;
+                const originalPrice = parseFloat(originalPriceInput.value) || 0;
+                if (originalPrice > 0 && salePrice > 0) {
+                    const discount = ((originalPrice - salePrice) / originalPrice) * 100;
+                    discountInput.value = Math.round(discount);
+                } else {
+                    discountInput.value = '';
+                }
+            };
+            originalPriceInput.addEventListener('input', calculateDiscount);
+            priceInput.addEventListener('input', calculateDiscount);
+        }
+    });
+
+    // Save scroll position before form submission
+    document.addEventListener('submit', function(e) {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    });
 });
-}
-
-editForms.forEach(form => {
-form.addEventListener('submit', function(e) {
-if (!validateForm(this)) {
-e.preventDefault();
-e.stopPropagation();
-return false;
-}
-});
-});
-});
-
-function validateForm(form) {
-let isValid = true;
-const nameInput = form.querySelector('input[name="name"]');
-const categoryInput = form.querySelector('select[name="category"]');
-const priceInput = form.querySelector('input[name="price"]');
-const originalPriceInput = form.querySelector('input[name="original_price"]');
-
-// Clear previous error states
-priceInput.classList.remove('is-invalid');
-const existingError = priceInput.parentElement.querySelector('.invalid-feedback');
-if (existingError) {
-existingError.remove();
-}
-
-if (!nameInput.value.trim()) {
-isValid = false;
-}
-
-if (!categoryInput.value) {
-isValid = false;
-}
-
-const price = parseFloat(priceInput.value) || 0;
-const originalPrice = parseFloat(originalPriceInput.value) || 0;
-
-if (originalPrice > 0 && price > 0 && originalPrice <= price) {
-isValid = false;
-priceInput.classList.add('is-invalid');
-const errorDiv = document.createElement('div');
-errorDiv.className = 'invalid-feedback d-block';
-errorDiv.textContent = 'Sale price must be less than original price.';
-priceInput.parentElement.appendChild(errorDiv);
-}
-
-return isValid;
-}
-
-const priceInput = document.getElementById('price');
-const originalPriceInput = document.getElementById('original_price');
-const discountInput = document.getElementById('discount_percentage');
-
-if (priceInput && originalPriceInput && discountInput) {
-const calculateDiscount = () => {
-const salePrice = parseFloat(priceInput.value) || 0;
-const originalPrice = parseFloat(originalPriceInput.value) || 0;
-if (originalPrice > 0 && salePrice > 0) {
-const discount = ((originalPrice - salePrice) / originalPrice) * 100;
-discountInput.value = Math.round(discount);
-} else {
-discountInput.value = '';
-}
-};
-originalPriceInput.addEventListener('input', calculateDiscount);
-priceInput.addEventListener('input', calculateDiscount);
-}
 </script>
 
 
 <script>
 function deletePageImage(pageName, imageField) {
     if (confirm('Are you sure you want to remove this image?')) {
+        // Save scroll position before operation
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+        
         let endpoint = '';
         
         if (pageName === 'perfume_page') {
@@ -428,4 +482,9 @@ function deletePageImage(pageName, imageField) {
         });
     }
 }
+
+// Save scroll position before form submission
+document.addEventListener('submit', function(e) {
+    sessionStorage.setItem('scrollPosition', window.scrollY);
+});
 </script>

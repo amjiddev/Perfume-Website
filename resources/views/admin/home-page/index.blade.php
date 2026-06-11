@@ -293,6 +293,20 @@
 @endsection
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Restore scroll position from sessionStorage
+    const savedScrollY = sessionStorage.getItem('scrollPosition');
+    if (savedScrollY) {
+        window.scrollTo(0, parseInt(savedScrollY));
+        sessionStorage.removeItem('scrollPosition');
+    }
+
+    // Save scroll position before form submission
+    document.addEventListener('submit', function(e) {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    });
+});
+
 function addFeature() {
     const container = document.getElementById('features-container');
     const div = document.createElement('div');

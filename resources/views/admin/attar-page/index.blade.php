@@ -166,7 +166,7 @@ Attar Page Settings
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editAttarProductModal" 
-                                                    onclick="editAttarProduct({{ $product->id }}, '{{ $product->name }}', '{{ addslashes($product->description) }}', {{ $product->price }}, {{ $product->original_price ?? 'null' }}, '{{ $product->type }}', {{ $product->rating }}, {{ $product->reviews_count }}, '{{ $product->image }}', {{ $product->sort_order }})">
+                                                    onclick="clearAttarErrors(); editAttarProduct({{ $product->id }}, '{{ $product->name }}', '{{ addslashes($product->description) }}', {{ $product->price }}, {{ $product->original_price ?? 'null' }}, '{{ $product->type }}', {{ $product->rating }}, {{ $product->reviews_count }}, '{{ $product->image }}', {{ $product->sort_order }})">
                                                 Edit
                                             </button>
                                             <form action="{{ route('admin.attar-page.delete-product', $product) }}" method="POST" style="display: inline;">
@@ -226,20 +226,27 @@ Attar Page Settings
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="price" class="form-label">Price (optional)</label>
+                                <label for="price" class="form-label">Sale Price (optional)</label>
                                 <input type="number" class="form-control" id="price" name="price" step="0.01">
                                 <div class="invalid-feedback d-block" id="error-price"></div>
                                 <small class="text-muted d-block mt-1">Leave empty to use original price</small>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="original_price" class="form-label">Original Price (optional)</label>
                                 <input type="number" class="form-control" id="original_price" name="original_price" step="0.01" placeholder="Leave empty if no discount">
                                 <div class="invalid-feedback d-block" id="error-original_price"></div>
-                                <small class="text-muted d-block mt-1">Leave empty if product has no discount</small>
+                                <small class="text-muted d-block mt-1">Leave empty if no discount</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="discount_percentage" class="form-label">Discount % (Auto)</label>
+                                <input type="number" class="form-control" id="discount_percentage" name="discount_percentage" readonly>
+                                <div class="invalid-feedback d-block" id="error-discount_percentage"></div>
                             </div>
                         </div>
                     </div>
@@ -316,17 +323,25 @@ Attar Page Settings
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="edit_price" class="form-label">Price <span class="text-danger">*</span></label>
+                                <label for="edit_price" class="form-label">Sale Price <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="edit_price" name="price" step="0.01" required>
+                                <div id="edit_price_error" class="invalid-feedback d-block" style="display: none; color: #dc3545; font-size: 0.875em; margin-top: 0.25rem;"></div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="edit_original_price" class="form-label">Original Price (optional)</label>
                                 <input type="number" class="form-control" id="edit_original_price" name="original_price" step="0.01" placeholder="Leave empty if no discount">
-                                <small class="text-muted d-block mt-1">Leave empty if product has no discount</small>
+                                <small class="text-muted d-block mt-1">Leave empty if no discount</small>
+                                <div id="edit_original_price_error" class="invalid-feedback d-block" style="display: none; color: #dc3545; font-size: 0.875em; margin-top: 0.25rem;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_discount_percentage" class="form-label">Discount % (Auto)</label>
+                                <input type="number" class="form-control" id="edit_discount_percentage" name="discount_percentage" readonly>
                             </div>
                         </div>
                     </div>
@@ -369,6 +384,30 @@ Attar Page Settings
 <script>
     let currentProductId = null;
 
+    // Clear attar product errors when opening edit modal
+    function clearAttarErrors() {
+        const priceInput = document.getElementById('edit_price');
+        const originalPriceInput = document.getElementById('edit_original_price');
+        const priceErrorDiv = document.getElementById('edit_price_error');
+        const originalPriceErrorDiv = document.getElementById('edit_original_price_error');
+
+        // Clear error states
+        if (priceInput) {
+            priceInput.classList.remove('is-invalid');
+        }
+        if (originalPriceInput) {
+            originalPriceInput.classList.remove('is-invalid');
+        }
+        if (priceErrorDiv) {
+            priceErrorDiv.style.display = 'none';
+            priceErrorDiv.textContent = '';
+        }
+        if (originalPriceErrorDiv) {
+            originalPriceErrorDiv.style.display = 'none';
+            originalPriceErrorDiv.textContent = '';
+        }
+    }
+
     function editAttarProduct(id, name, description, price, originalPrice, type, rating, reviewsCount, image, sortOrder) {
         currentProductId = id;
         document.getElementById('edit_name').value = name;
@@ -379,6 +418,15 @@ Attar Page Settings
         document.getElementById('edit_rating').value = rating || '';
         document.getElementById('edit_reviews_count').value = reviewsCount || '';
         document.getElementById('edit_sort_order').value = sortOrder;
+
+        // Calculate discount percentage
+        const discountInput = document.getElementById('edit_discount_percentage');
+        if (originalPrice && originalPrice > 0 && price > 0) {
+            const discount = ((originalPrice - price) / originalPrice) * 100;
+            discountInput.value = Math.round(discount);
+        } else {
+            discountInput.value = '';
+        }
 
         // Update form action
         document.getElementById('editAttarProductForm').action = `/admin/attar-page/products/${id}`;
@@ -401,6 +449,9 @@ Attar Page Settings
         if (!confirm('Are you sure you want to delete this image?')) {
             return;
         }
+
+        // Save scroll position before operation
+        sessionStorage.setItem('scrollPosition', window.scrollY);
 
         fetch('{{ route("admin.attar-page.delete-image") }}', {
             method: 'POST',
@@ -429,10 +480,109 @@ Attar Page Settings
 
     // Auto-open add product modal if there are errors
     document.addEventListener('DOMContentLoaded', function() {
+        // Restore scroll position from sessionStorage
+        const savedScrollY = sessionStorage.getItem('scrollPosition');
+        if (savedScrollY) {
+            window.scrollTo(0, parseInt(savedScrollY));
+            sessionStorage.removeItem('scrollPosition');
+        }
+
         @if($errors->any())
             const addModal = new bootstrap.Modal(document.getElementById('addAttarProductModal'));
             addModal.show();
         @endif
+
+        // Add discount calculation to add form
+        const addForm = document.getElementById('addProductForm');
+        if (addForm) {
+            const addPriceInput = addForm.querySelector('input[name="price"]');
+            const addOriginalPriceInput = addForm.querySelector('input[name="original_price"]');
+            const addDiscountInput = addForm.querySelector('input[name="discount_percentage"]');
+
+            if (addPriceInput && addOriginalPriceInput && addDiscountInput) {
+                const calculateDiscount = () => {
+                    const salePrice = parseFloat(addPriceInput.value) || 0;
+                    const originalPrice = parseFloat(addOriginalPriceInput.value) || 0;
+                    if (originalPrice > 0 && salePrice > 0) {
+                        const discount = ((originalPrice - salePrice) / originalPrice) * 100;
+                        addDiscountInput.value = Math.round(discount);
+                    } else {
+                        addDiscountInput.value = '';
+                    }
+                };
+                addOriginalPriceInput.addEventListener('input', calculateDiscount);
+                addPriceInput.addEventListener('input', calculateDiscount);
+            }
+        }
+
+        // Add validation to edit form
+        const editForm = document.getElementById('editAttarProductForm');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                const priceInput = document.getElementById('edit_price');
+                const originalPriceInput = document.getElementById('edit_original_price');
+                const priceErrorDiv = document.getElementById('edit_price_error');
+                const originalPriceErrorDiv = document.getElementById('edit_original_price_error');
+                
+                const price = parseFloat(priceInput.value) || 0;
+                const originalPrice = parseFloat(originalPriceInput.value) || 0;
+
+                // Reset all errors
+                priceInput.classList.remove('is-invalid');
+                originalPriceInput.classList.remove('is-invalid');
+                priceErrorDiv.style.display = 'none';
+                priceErrorDiv.textContent = '';
+                originalPriceErrorDiv.style.display = 'none';
+                originalPriceErrorDiv.textContent = '';
+
+                // Validate: sale price must be less than original price (if original price is provided)
+                if (originalPrice > 0 && price >= originalPrice) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Show errors on both fields
+                    priceInput.classList.add('is-invalid');
+                    originalPriceInput.classList.add('is-invalid');
+                    
+                    priceErrorDiv.textContent = 'Sale price must be less than original price.';
+                    priceErrorDiv.style.display = 'block';
+                    
+                    originalPriceErrorDiv.textContent = 'Original price must be greater than sale price.';
+                    originalPriceErrorDiv.style.display = 'block';
+
+                    // Scroll to error
+                    priceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    priceInput.focus();
+
+                    return false;
+                }
+            });
+
+            // Add discount calculation to edit form
+            const editPriceInput = editForm.querySelector('input[name="price"]');
+            const editOriginalPriceInput = editForm.querySelector('input[name="original_price"]');
+            const editDiscountInput = editForm.querySelector('input[name="discount_percentage"]');
+
+            if (editPriceInput && editOriginalPriceInput && editDiscountInput) {
+                const calculateDiscount = () => {
+                    const salePrice = parseFloat(editPriceInput.value) || 0;
+                    const originalPrice = parseFloat(editOriginalPriceInput.value) || 0;
+                    if (originalPrice > 0 && salePrice > 0) {
+                        const discount = ((originalPrice - salePrice) / originalPrice) * 100;
+                        editDiscountInput.value = Math.round(discount);
+                    } else {
+                        editDiscountInput.value = '';
+                    }
+                };
+                editOriginalPriceInput.addEventListener('input', calculateDiscount);
+                editPriceInput.addEventListener('input', calculateDiscount);
+            }
+        }
+
+        // Save scroll position before form submission
+        document.addEventListener('submit', function(e) {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        });
     });
 
     function submitAddProductForm() {

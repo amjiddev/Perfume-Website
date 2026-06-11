@@ -380,6 +380,13 @@
 <script>
 // Keep modal open if there are validation errors
 document.addEventListener('DOMContentLoaded', function() {
+    // Restore scroll position from sessionStorage
+    const savedScrollY = sessionStorage.getItem('scrollPosition');
+    if (savedScrollY) {
+        window.scrollTo(0, parseInt(savedScrollY));
+        sessionStorage.removeItem('scrollPosition');
+    }
+
     @if ($errors->any())
         // Check if any error fields exist in the add product modal
         const addModalFields = ['name', 'category', 'price', 'original_price', 'description', 'rating', 'reviews_count', 'image'];
@@ -493,6 +500,9 @@ if (priceInput && originalPriceInput && discountInput) {
 <script>
 function deletePageImage(pageName, imageField) {
     if (confirm('Are you sure you want to remove this image?')) {
+        // Save scroll position before operation
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+        
         let endpoint = '';
         
         if (pageName === 'shop_page') {
@@ -526,4 +536,9 @@ function deletePageImage(pageName, imageField) {
         });
     }
 }
+
+// Save scroll position before form submission
+document.addEventListener('submit', function(e) {
+    sessionStorage.setItem('scrollPosition', window.scrollY);
+});
 </script>

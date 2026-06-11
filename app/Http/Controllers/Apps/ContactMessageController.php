@@ -33,11 +33,39 @@ class ContactMessageController extends Controller
     }
 
     /**
+     * Mark a message as read
+     */
+    public function markAsRead(ContactMessage $message)
+    {
+        if (!$message->is_read) {
+            $message->markAsRead();
+        }
+        
+        // Check if this is an AJAX request
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Message marked as read'
+            ]);
+        }
+        
+        return redirect()->back();
+    }
+
+    /**
      * Delete a message
      */
     public function destroy(ContactMessage $message)
     {
         $message->delete();
+        
+        // Check if this is an AJAX request
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Message deleted successfully!'
+            ]);
+        }
         
         return redirect()->route('admin.messages.index')
             ->with('success', 'Message deleted successfully!');

@@ -133,6 +133,7 @@ Route::middleware(['admin_or_redirect'])->group(function () {
     Route::controller(\App\Http\Controllers\Apps\ContactMessageController::class)->prefix('admin/messages')->as('admin.messages.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{message}', 'show')->name('show');
+        Route::post('{message}/mark-read', 'markAsRead')->name('mark-read');
         Route::delete('{message}', 'destroy')->name('destroy');
     });
 });

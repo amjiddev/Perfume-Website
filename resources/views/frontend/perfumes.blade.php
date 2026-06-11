@@ -577,6 +577,22 @@
                 font-size: 0.85rem;
             }
         }
+
+        /* Tablet 1024px Responsive */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+
+            .product-info {
+                padding: 1.2rem;
+            }
+
+            .product-card-perfume h5 {
+                font-size: 1rem;
+            }
+        }
     </style>
 
     <script>

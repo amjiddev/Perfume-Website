@@ -290,6 +290,21 @@
         </div>
     </div>
 
+    <!-- Message Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: white; border-bottom: 1px solid #eee; padding: 1.5rem;">
+                    <h5 class="modal-title" id="messageModalLabel" style="margin: 0; color: #333; font-weight: 700;">Message Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="messageModalBody" style="padding: 2rem;">
+                    <!-- Message details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Subscriber Modal -->
     <div class="modal fade" id="subscriberModal" tabindex="-1" role="dialog" aria-labelledby="subscriberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm" role="document">
@@ -678,7 +693,7 @@
     /* Review Status Cards */
     .review-status-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
         margin-bottom: 3rem;
     }
@@ -1074,6 +1089,18 @@
     }
 
     /* Responsive */
+    /* Tablet (769px to 991px) */
+    @media (max-width: 991px) and (min-width: 769px) {
+        .review-status-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .status-card {
+            flex-direction: row;
+        }
+    }
+
+    /* Mobile (max-width: 768px) */
     @media (max-width: 768px) {
         .dashboard-container {
             padding: 1rem;
@@ -1146,23 +1173,43 @@
         notificationItems.forEach(item => {
             item.addEventListener('click', function() {
                 const notificationId = this.getAttribute('data-notification-id');
-                const orderData = JSON.parse(this.getAttribute('data-order-data'));
+                const orderDataAttr = this.getAttribute('data-order-data');
+                const messageDataAttr = this.getAttribute('data-message-data');
                 
-                // Open the order modal with the notification data
-                openOrderModal(
-                    orderData.id,
-                    orderData.customer_name,
-                    orderData.email,
-                    orderData.phone,
-                    orderData.address,
-                    orderData.city,
-                    orderData.state,
-                    orderData.zip,
-                    orderData.products || [],
-                    orderData.total,
-                    orderData.notes || '',
-                    orderData.status || 'pending'
-                );
+                if (orderDataAttr) {
+                    // Handle order notification
+                    const orderData = JSON.parse(orderDataAttr);
+                    
+                    // Open the order modal with the notification data
+                    openOrderModal(
+                        orderData.id,
+                        orderData.customer_name,
+                        orderData.email,
+                        orderData.phone,
+                        orderData.address,
+                        orderData.city,
+                        orderData.state,
+                        orderData.zip,
+                        orderData.products || [],
+                        orderData.total,
+                        orderData.notes || '',
+                        orderData.status || 'pending'
+                    );
+                } else if (messageDataAttr) {
+                    // Handle message notification
+                    const messageData = JSON.parse(messageDataAttr);
+                    
+                    // Open the message modal
+                    openMessageModal(
+                        messageData.id,
+                        messageData.name,
+                        messageData.email,
+                        messageData.phone,
+                        messageData.subject,
+                        messageData.message,
+                        messageData.is_read
+                    );
+                }
                 
                 // Decrease badge count
                 decreaseNotificationBadge();
@@ -1440,15 +1487,42 @@
 
     // Open orders by status
     function openOrdersByStatus(status) {
+        // Show loading state
+        document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" style="padding: 2rem; text-align: center;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #667eea;"></i><p style="margin-top: 1rem; color: #667eea;">Loading orders...</p></td></tr>';
+        
+        // First close any existing modals properly
+        const existingModals = document.querySelectorAll('.modal.show');
+        existingModals.forEach(modal => {
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+        });
+        
+        // Remove all backdrops
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        
         // Fetch orders from database based on status
         fetch(`/api/orders-by-status?status=${status}`, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            if (!data.success && !data.orders) {
+                throw new Error(data.message || 'Failed to load orders');
+            }
+            
             const orders = data.orders || [];
 
             // Set title
@@ -1529,18 +1603,20 @@
 
             document.getElementById('ordersTableBody').innerHTML = tableHTML;
 
-            // Close current modals and open orders list modal
-            const currentModal = bootstrap.Modal.getInstance(document.getElementById('orderModal'));
-            if (currentModal) {
-                currentModal.hide();
-            }
-
+            // Open orders list modal
             const ordersListModal = new bootstrap.Modal(document.getElementById('ordersListModal'));
             ordersListModal.show();
         })
         .catch(error => {
             console.error('Error fetching orders:', error);
-            alert('Error loading orders');
+            document.getElementById('ordersTableBody').innerHTML = `
+                <tr>
+                    <td colspan="7" style="padding: 2rem; text-align: center; color: #dc3545;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        Error loading orders: ${error.message}
+                    </td>
+                </tr>
+            `;
         });
     }
     let currentOrderId = null;
@@ -1803,6 +1879,152 @@
         }
     }
 
+    // Message Modal Functions
+    let currentMessageId = null;
+
+    function openMessageModal(messageId, name, email, phone, subject, message, isRead) {
+        currentMessageId = messageId;
+        
+        // Mark message as read
+        if (!isRead) {
+            markMessageAsRead(messageId);
+        }
+
+        const readBadge = `<span style="display: inline-block; background: #28a745; color: white; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">Read</span>`;
+        const unreaderBadge = `<span style="display: inline-block; background: #dc3545; color: white; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">Unread</span>`;
+        
+        const modalBody = `
+            <div style="padding: 0;">
+                <!-- Sender Information Section -->
+                <h6 style="margin-bottom: 1rem; font-weight: 700; color: #999; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Sender Information</h6>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div>
+                        <p style="margin: 0 0 0.5rem 0; color: #333; font-weight: 600; font-size: 0.9rem;">Full Name</p>
+                        <p style="margin: 0; color: #666; font-size: 0.95rem;">${name}</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 0.5rem 0; color: #333; font-weight: 600; font-size: 0.9rem;">Status</p>
+                        <p style="margin: 0;">${isRead ? readBadge : unreaderBadge}</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div>
+                        <p style="margin: 0 0 0.5rem 0; color: #333; font-weight: 600; font-size: 0.9rem;">Email Address</p>
+                        <p style="margin: 0; color: #667eea;"><a href="mailto:${email}" style="color: #667eea; text-decoration: none;">${email}</a></p>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 0.5rem 0; color: #333; font-weight: 600; font-size: 0.9rem;">Phone Number</p>
+                        <p style="margin: 0; color: #667eea;"><a href="tel:${phone}" style="color: #667eea; text-decoration: none;">${phone}</a></p>
+                    </div>
+                </div>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+
+                <!-- Message Section -->
+                <h6 style="margin-bottom: 1rem; font-weight: 700; color: #999; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Message</h6>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <p style="margin: 0 0 0.5rem 0; color: #333; font-weight: 600; font-size: 0.9rem;">Subject</p>
+                    <p style="margin: 0; color: #666; font-size: 0.95rem;">${subject}</p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <p style="margin: 0 0 0.5rem 0; color: #333; font-weight: 600; font-size: 0.9rem;">Message</p>
+                    <p style="margin: 0; color: #666; font-size: 0.95rem; white-space: pre-wrap; line-height: 1.6; background: #f5f5f5; padding: 1rem; border-radius: 4px;">${message}</p>
+                </div>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+
+                <!-- Details Section -->
+                <h6 style="margin-bottom: 1rem; font-weight: 700; color: #999; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Details</h6>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div>
+                        <p style="margin: 0; color: #999; font-size: 0.85rem;"><strong>Received:</strong> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0; color: #999; font-size: 0.85rem;"><strong>Last Updated:</strong> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" class="btn btn-danger" onclick="deleteMessageFromModal()" style="padding: 0.6rem 1.5rem; font-weight: 600; border: none; border-radius: 4px; cursor: pointer;">
+                        <i class="fas fa-trash" style="margin-right: 0.5rem;"></i> Delete Message
+                    </button>
+                    <a href="mailto:${email}?subject=Re: ${encodeURIComponent(subject)}" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;">
+                        <i class="fas fa-reply" style="margin-right: 0.5rem;"></i> Reply via Email
+                    </a>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('messageModalBody').innerHTML = modalBody;
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+        modal.show();
+    }
+
+    function markMessageAsRead(messageId) {
+        fetch(`/admin/messages/${messageId}/mark-read`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Message marked as read');
+        })
+        .catch(error => console.error('Error marking message as read:', error));
+    }
+
+    function deleteMessageFromModal() {
+        if (!currentMessageId) return;
+        
+        if (confirm('Are you sure you want to delete this message?')) {
+            fetch(`/admin/messages/${currentMessageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Message deleted successfully!');
+                    
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('messageModal'));
+                    if (modal) modal.hide();
+                    
+                    // Reload the page to show updated messages
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    alert('Failed to delete message: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting message: ' + error.message);
+            });
+        }
+    }
+
     function markOrderPendingFromModal() {
         if (!currentOrderId) return;
         
@@ -1874,13 +2096,10 @@
             .then(data => {
                 if (data.success) {
                     alert('Order deleted successfully!');
-                    // Close modal and refresh orders list
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('ordersListModal'));
-                    if (modal) modal.hide();
-                    // Refresh the orders list by clicking the current status card
+                    // Keep modal open - do NOT close it
+                    // Refresh the orders list to show updated data
                     setTimeout(() => {
                         updateStatusCards();
-                        location.reload(); // Reload page to refresh data
                     }, 500);
                 } else {
                     alert('Failed to delete order: ' + (data.message || 'Unknown error'));
@@ -2022,6 +2241,15 @@
             console.error('Error:', error);
             alert('Error changing password');
         });
+    });
+
+    // Fix modal backdrop issue when closing
+    document.addEventListener('hidden.bs.modal', function(event) {
+        // Remove all backdrops and body overflow when any modal is hidden
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
     });
 </script>
 
