@@ -26,10 +26,23 @@
                 <ul class="list-unstyled">
                     @php
                         $serviceLinks = $footerSettings->customer_service_links ?? [
-                            ['label' => 'Privacy Policy', 'url' => '#'],
-                            ['label' => 'Terms & Conditions', 'url' => '#'],
-                            ['label' => 'Disclaimer', 'url' => '#'],
+                            ['label' => 'Privacy Policy', 'url' => route('privacy-policy')],
+                            ['label' => 'Terms & Conditions', 'url' => route('terms-and-conditions')],
+                            ['label' => 'Disclaimer', 'url' => route('disclaimer')],
                         ];
+
+                        foreach ($serviceLinks as &$link) {
+                            if (($link['url'] ?? '#') === '#') {
+                                if (($link['label'] ?? '') === 'Privacy Policy') {
+                                    $link['url'] = route('privacy-policy');
+                                } elseif (($link['label'] ?? '') === 'Terms & Conditions') {
+                                    $link['url'] = route('terms-and-conditions');
+                                } elseif (($link['label'] ?? '') === 'Disclaimer') {
+                                    $link['url'] = route('disclaimer');
+                                }
+                            }
+                        }
+                        unset($link);
                     @endphp
                     @foreach($serviceLinks as $link)
                         <li><a href="{{ $link['url'] ?? '#' }}">{{ $link['label'] ?? '' }}</a></li>
@@ -41,14 +54,16 @@
                 <div>
                     <ul>
                         @php
-                            $socialLinks = $footerSettings->social_links ?? [
-                                ['icon' => 'facebook', 'label' => 'Facebook', 'url' => '#'],
-                                ['icon' => 'instagram', 'label' => 'Instagram', 'url' => '#'],
-                                ['icon' => 'tiktok', 'label' => 'TikTok', 'url' => '#'],
+                            $socialLinks = [
+                                ['icon' => 'facebook', 'label' => 'Facebook', 'url' => $footerSettings->facebook_url ?? '#'],
+                                ['icon' => 'instagram', 'label' => 'Instagram', 'url' => $footerSettings->instagram_url ?? '#'],
+                                ['icon' => 'tiktok', 'label' => 'TikTok', 'url' => $footerSettings->tiktok_url ?? '#'],
                             ];
                         @endphp
                         @foreach($socialLinks as $social)
-                            <li><a href="{{ $social['url'] ?? '#' }}" class="me-2"><i class="fab fa-{{ $social['icon'] ?? 'facebook' }}"></i> {{ $social['label'] ?? '' }}</a></li>
+                            @if($social['url'] && $social['url'] !== '#')
+                                <li><a href="{{ $social['url'] }}" class="me-2" target="_blank" rel="noopener noreferrer"><i class="fab fa-{{ $social['icon'] }}"></i> {{ $social['label'] }}</a></li>
+                            @endif
                         @endforeach
                     </ul>
                 </div>

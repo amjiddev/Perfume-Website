@@ -152,7 +152,7 @@
                                 <div class="price-section">
                                     @if (($relatedProduct->price ?? 0) > 0)
                                         <p class="price">Rs {{ number_format($relatedProduct->price) }}</p>
-                                        @if($relatedProduct->original_price ?? 0)
+                                        @if(($relatedProduct->original_price ?? 0) > $relatedProduct->price)
                                             <p class="original-price"><s>Rs {{ number_format($relatedProduct->original_price) }}</s></p>
                                         @endif
                                     @else

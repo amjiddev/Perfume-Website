@@ -19,11 +19,12 @@
 
     <meta name="author" content="" />
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="">
-    <link rel="icon" type="image/png" sizes="16x16" href="">
-    <link rel="shortcut icon" href="">
-    <link rel="apple-touch-icon" sizes="180x180" href="">
+    <!-- Favicons with cache busting -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
+    <link rel="shortcut icon" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
 
     {{-- <link rel="manifest" href="{{ asset('favicon/site.webmanifest') }}"> --}}
 

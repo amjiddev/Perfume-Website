@@ -48,8 +48,8 @@
                                 <span>({{ $product->reviews_count }})</span>
                             </div>
                             <div class="price-section-attar">
-                                <p class="price-attar">Rs {{ number_format($product->price, 0) }}</p>
-                                @if($product->original_price)
+                                <p class="price-attar">Rs {{ number_format($product->price ?? $product->original_price, 0) }}</p>
+                                @if($product->price && $product->original_price > $product->price)
                                     <p class="original-price-attar"><s>Rs {{ number_format($product->original_price, 0) }}</s></p>
                                 @endif
                             </div>

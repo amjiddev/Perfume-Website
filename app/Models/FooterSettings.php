@@ -13,6 +13,9 @@ class FooterSettings extends Model
         'customer_service_links',
         'social_links',
         'copyright_text',
+        'facebook_url',
+        'instagram_url',
+        'tiktok_url',
     ];
 
     protected $casts = [

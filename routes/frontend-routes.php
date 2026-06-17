@@ -24,4 +24,7 @@ Route::get('/product/{id}', [PerfumeController::class, 'productDetail'])->name('
 Route::get('/checkout', [PerfumeController::class, 'checkout'])->name('checkout');
 Route::get('/about', [PerfumeController::class, 'about'])->name('about');
 Route::get('/contact', [PerfumeController::class, 'contact'])->name('contact');
+Route::get('/privacy-policy', [PerfumeController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-and-conditions', [PerfumeController::class, 'termsAndConditions'])->name('terms-and-conditions');
+Route::get('/disclaimer', [PerfumeController::class, 'disclaimer'])->name('disclaimer');
 Route::post('/contact/submit', [\App\Http\Controllers\Apps\ContactMessageController::class, 'store'])->name('contact.submit');

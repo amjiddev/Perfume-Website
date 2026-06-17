@@ -252,12 +252,14 @@ class Theme
      */
     function includeFavicon()
     {
-        $faviconPath = asset(config('settings.KT_THEME_ASSETS.favicon'));
+        $faviconPath = asset(config('settings.KT_THEME_ASSETS.favicon') . '?v=' . time());
         return sprintf(
-            '<link rel="icon" type="image/png" sizes="32x32" href="%s">' . "\n" .
+            '<link rel="icon" type="image/svg+xml" href="%s">' . "\n" .
+                '    <link rel="icon" type="image/png" sizes="32x32" href="%s">' . "\n" .
                 '    <link rel="icon" type="image/png" sizes="16x16" href="%s">' . "\n" .
                 '    <link rel="shortcut icon" href="%s">' . "\n" .
                 '    <link rel="apple-touch-icon" sizes="180x180" href="%s">',
+            $faviconPath,
             $faviconPath,
             $faviconPath,
             $faviconPath,

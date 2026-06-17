@@ -89,7 +89,7 @@ class AttarPageController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'price' => 'nullable|numeric|min:0',
-                'original_price' => 'nullable|numeric|min:0',
+                'original_price' => 'required|numeric|min:0',
                 'rating' => 'nullable|numeric|min:0|max:5',
                 'reviews_count' => 'nullable|integer|min:0',
                 'type' => 'required|in:Oud,Floral,Musk,Woody',
@@ -103,18 +103,22 @@ class AttarPageController extends Controller
             throw $e;
         }
 
-        // If price not provided, use original_price as price
-        if (!$validated['price'] && $validated['original_price']) {
-            $validated['price'] = $validated['original_price'];
-        }
-
-        // Calculate discount percentage only if both prices are provided and original > price
-        if ($validated['price'] && $validated['original_price'] && $validated['original_price'] > $validated['price']) {
+        // Calculate discount percentage only if sale price is provided and original > sale
+        if ($validated['price'] && $validated['original_price'] > $validated['price']) {
             $discount = (($validated['original_price'] - $validated['price']) / $validated['original_price']) * 100;
             $validated['discount_percentage'] = round($discount);
         } else {
             $validated['discount_percentage'] = null;
-            $validated['original_price'] = null;
+        }
+
+        // Convert empty price to null
+        if (empty($validated['price'])) {
+            $validated['price'] = null;
+        }
+
+        // Convert empty rating to null
+        if (empty($validated['rating'])) {
+            $validated['rating'] = null;
         }
 
         if ($request->hasFile('image')) {
@@ -139,7 +143,7 @@ class AttarPageController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
+            'original_price' => 'required|numeric|min:0',
             'rating' => 'nullable|numeric|min:0|max:5',
             'reviews_count' => 'nullable|integer|min:0',
             'type' => 'required|in:Oud,Floral,Musk,Woody',
@@ -147,18 +151,22 @@ class AttarPageController extends Controller
             'sort_order' => 'nullable|integer',
         ]);
 
-        // If price not provided, use original_price as price
-        if (!$validated['price'] && $validated['original_price']) {
-            $validated['price'] = $validated['original_price'];
-        }
-
-        // Calculate discount percentage only if both prices are provided and original > price
-        if ($validated['price'] && $validated['original_price'] && $validated['original_price'] > $validated['price']) {
+        // Calculate discount percentage only if sale price is provided and original > sale
+        if ($validated['price'] && $validated['original_price'] > $validated['price']) {
             $discount = (($validated['original_price'] - $validated['price']) / $validated['original_price']) * 100;
             $validated['discount_percentage'] = round($discount);
         } else {
             $validated['discount_percentage'] = null;
-            $validated['original_price'] = null;
+        }
+
+        // Convert empty price to null
+        if (empty($validated['price'])) {
+            $validated['price'] = null;
+        }
+
+        // Convert empty rating to null
+        if (empty($validated['rating'])) {
+            $validated['rating'] = null;
         }
 
         if ($request->hasFile('image')) {
@@ -170,6 +178,7 @@ class AttarPageController extends Controller
             $filename = 'attar-' . time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/attar-products'), $filename);
             $validated['image'] = 'uploads/attar-products/' . $filename;
+
         }
 
         $attarProduct->update($validated);

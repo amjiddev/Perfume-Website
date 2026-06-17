@@ -83,6 +83,9 @@ class LandingPageController extends Controller
                 'about_features.*' => 'string|max:255',
                 'company_name' => 'required|string|max:255',
                 'company_description' => 'required|string',
+                'facebook_url' => 'nullable|url',
+                'instagram_url' => 'nullable|url',
+                'tiktok_url' => 'nullable|url',
             ]);
 
             // Handle HomePage
@@ -129,11 +132,14 @@ class LandingPageController extends Controller
                 $homePage->update($validated);
             }
 
-            // Handle FooterSettings
+            // Handle FooterSettings with social media URLs
             $footerSettings = \App\Models\FooterSettings::first();
             $footerData = [
                 'company_name' => $validated['company_name'],
                 'company_description' => $validated['company_description'],
+                'facebook_url' => $validated['facebook_url'] ?? null,
+                'instagram_url' => $validated['instagram_url'] ?? null,
+                'tiktok_url' => $validated['tiktok_url'] ?? null,
             ];
 
             if (!$footerSettings) {

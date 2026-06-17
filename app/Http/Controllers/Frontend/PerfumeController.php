@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Data\Products;
 
 class PerfumeController extends Controller
 {
@@ -69,6 +68,30 @@ class PerfumeController extends Controller
         ]);
         
         return view('frontend.contact', compact('contactPage'));
+    }
+
+    public function privacyPolicy()
+    {
+        return view('frontend.policy-page', [
+            'pageType' => 'privacy',
+            'title' => 'Privacy Policy'
+        ]);
+    }
+
+    public function termsAndConditions()
+    {
+        return view('frontend.policy-page', [
+            'pageType' => 'terms',
+            'title' => 'Terms & Conditions'
+        ]);
+    }
+
+    public function disclaimer()
+    {
+        return view('frontend.policy-page', [
+            'pageType' => 'disclaimer',
+            'title' => 'Disclaimer'
+        ]);
     }
 
     public function productDetail($id)

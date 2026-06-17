@@ -142,7 +142,7 @@ Attar Page Settings
                                         </td>
                                         <td>{{ $product->name }}</td>
                                         <td><span class="badge bg-info">{{ $product->type }}</span></td>
-                                        <td>Rs {{ number_format($product->price, 0) }}</td>
+                                        <td>Rs {{ number_format($product->price ?? $product->original_price, 0) }}</td>
                                         <td>
                                             @if($product->discount_percentage)
                                                 <span class="badge bg-danger">-{{ $product->discount_percentage }}%</span>
@@ -151,7 +151,7 @@ Attar Page Settings
                                             @endif
                                         </td>
                                         <td>
-                                            @if($product->rating)
+                                            @if($product->rating && $product->rating > 0)
                                                 <div style="color: #FFD700;">
                                                     @for($i = 0; $i < floor($product->rating); $i++)
                                                         <i class="fas fa-star"></i>
@@ -166,7 +166,7 @@ Attar Page Settings
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editAttarProductModal" 
-                                                    onclick="clearAttarErrors(); editAttarProduct({{ $product->id }}, '{{ $product->name }}', '{{ addslashes($product->description) }}', {{ $product->price }}, {{ $product->original_price ?? 'null' }}, '{{ $product->type }}', {{ $product->rating }}, {{ $product->reviews_count }}, '{{ $product->image }}', {{ $product->sort_order }})">
+                                                    onclick="clearAttarErrors(); editAttarProduct({{ $product->id }}, '{{ $product->name }}', '{{ addslashes($product->description) }}', {{ $product->price ?? 'null' }}, {{ $product->original_price ?? 'null' }}, '{{ $product->type }}', {{ $product->rating ?? 'null' }}, {{ $product->reviews_count ?? 'null' }}, '{{ $product->image }}', {{ $product->sort_order ?? 0 }})">
                                                 Edit
                                             </button>
                                             <form action="{{ route('admin.attar-page.delete-product', $product) }}" method="POST" style="display: inline;">
@@ -228,18 +228,18 @@ Attar Page Settings
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="price" class="form-label">Sale Price (optional)</label>
+                                <label for="price" class="form-label">Sale Price</label>
                                 <input type="number" class="form-control" id="price" name="price" step="0.01">
                                 <div class="invalid-feedback d-block" id="error-price"></div>
-                                <small class="text-muted d-block mt-1">Leave empty to use original price</small>
+                                <small class="text-muted d-block mt-1">Leave empty if no discount</small>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="original_price" class="form-label">Original Price (optional)</label>
-                                <input type="number" class="form-control" id="original_price" name="original_price" step="0.01" placeholder="Leave empty if no discount">
+                                <label for="original_price" class="form-label">Original Price <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="original_price" name="original_price" step="0.01" required>
                                 <div class="invalid-feedback d-block" id="error-original_price"></div>
-                                <small class="text-muted d-block mt-1">Leave empty if no discount</small>
+                                <small class="text-muted d-block mt-1">Product price</small>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -325,16 +325,17 @@ Attar Page Settings
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="edit_price" class="form-label">Sale Price <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="edit_price" name="price" step="0.01" required>
+                                <label for="edit_price" class="form-label">Sale Price</label>
+                                <input type="number" class="form-control" id="edit_price" name="price" step="0.01">
                                 <div id="edit_price_error" class="invalid-feedback d-block" style="display: none; color: #dc3545; font-size: 0.875em; margin-top: 0.25rem;"></div>
+                                <small class="text-muted d-block mt-1">Leave empty if no discount</small>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="edit_original_price" class="form-label">Original Price (optional)</label>
-                                <input type="number" class="form-control" id="edit_original_price" name="original_price" step="0.01" placeholder="Leave empty if no discount">
-                                <small class="text-muted d-block mt-1">Leave empty if no discount</small>
+                                <label for="edit_original_price" class="form-label">Original Price <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="edit_original_price" name="original_price" step="0.01" required>
+                                <small class="text-muted d-block mt-1">Product price</small>
                                 <div id="edit_original_price_error" class="invalid-feedback d-block" style="display: none; color: #dc3545; font-size: 0.875em; margin-top: 0.25rem;"></div>
                             </div>
                         </div>
@@ -410,18 +411,18 @@ Attar Page Settings
 
     function editAttarProduct(id, name, description, price, originalPrice, type, rating, reviewsCount, image, sortOrder) {
         currentProductId = id;
-        document.getElementById('edit_name').value = name;
-        document.getElementById('edit_description').value = description;
-        document.getElementById('edit_price').value = price;
-        document.getElementById('edit_original_price').value = originalPrice || '';
-        document.getElementById('edit_type').value = type;
-        document.getElementById('edit_rating').value = rating || '';
-        document.getElementById('edit_reviews_count').value = reviewsCount || '';
-        document.getElementById('edit_sort_order').value = sortOrder;
+        document.getElementById('edit_name').value = name || '';
+        document.getElementById('edit_description').value = description || '';
+        document.getElementById('edit_price').value = (price && price !== 'null') ? price : '';
+        document.getElementById('edit_original_price').value = (originalPrice && originalPrice !== 'null') ? originalPrice : '';
+        document.getElementById('edit_type').value = type || '';
+        document.getElementById('edit_rating').value = (rating && rating !== 'null' && rating !== 0) ? rating : '';
+        document.getElementById('edit_reviews_count').value = (reviewsCount && reviewsCount !== 'null' && reviewsCount !== 0) ? reviewsCount : '';
+        document.getElementById('edit_sort_order').value = (sortOrder !== null && sortOrder !== undefined) ? sortOrder : 0;
 
         // Calculate discount percentage
         const discountInput = document.getElementById('edit_discount_percentage');
-        if (originalPrice && originalPrice > 0 && price > 0) {
+        if (originalPrice && originalPrice > 0 && price && price > 0) {
             const discount = ((originalPrice - price) / originalPrice) * 100;
             discountInput.value = Math.round(discount);
         } else {

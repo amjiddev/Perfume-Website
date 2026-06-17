@@ -190,6 +190,61 @@
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+                                <!-- Social Media Links Section -->
+                                <hr class="my-4">
+                                <h6 class="mb-3">Social Media Links (Follow Us Section)</h6>
+                                <p class="text-muted small mb-3">Add your social media profile links that will appear in the "Follow Us" section in the footer</p>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="facebook_url" class="form-label">
+                                                <i class="fab fa-facebook text-primary"></i> Facebook URL
+                                            </label>
+                                            <input type="url" class="form-control @error('facebook_url') is-invalid @enderror" 
+                                                   id="facebook_url" name="facebook_url" 
+                                                   value="{{ old('facebook_url', $footerSettings->facebook_url ?? '') }}" 
+                                                   placeholder="https://facebook.com/almukhtar">
+                                            @error('facebook_url')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                            <small class="text-muted d-block mt-1">Enter your Facebook page URL</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="instagram_url" class="form-label">
+                                                <i class="fab fa-instagram" style="color: #E4405F;"></i> Instagram URL
+                                            </label>
+                                            <input type="url" class="form-control @error('instagram_url') is-invalid @enderror" 
+                                                   id="instagram_url" name="instagram_url" 
+                                                   value="{{ old('instagram_url', $footerSettings->instagram_url ?? '') }}" 
+                                                   placeholder="https://instagram.com/almukhtar">
+                                            @error('instagram_url')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                            <small class="text-muted d-block mt-1">Enter your Instagram profile URL</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="tiktok_url" class="form-label">
+                                                <i class="fab fa-tiktok" style="color: #000;"></i> TikTok URL
+                                            </label>
+                                            <input type="url" class="form-control @error('tiktok_url') is-invalid @enderror" 
+                                                   id="tiktok_url" name="tiktok_url" 
+                                                   value="{{ old('tiktok_url', $footerSettings->tiktok_url ?? '') }}" 
+                                                   placeholder="https://tiktok.com/@almukhtar">
+                                            @error('tiktok_url')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                            <small class="text-muted d-block mt-1">Enter your TikTok profile URL</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
