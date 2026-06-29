@@ -20,11 +20,11 @@
     <meta name="author" content="" />
 
     <!-- Favicons with cache busting -->
-    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
-    <link rel="shortcut icon" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/media/logos/favicon.svg?v=' . time()) }}">
+    <link rel="icon" type="image/jpeg" href="{{ asset('frontend/images/loogo.jpeg?v=' . time()) }}">
+    <link rel="icon" type="image/jpeg" sizes="32x32" href="{{ asset('frontend/images/loogo.jpeg?v=' . time()) }}">
+    <link rel="icon" type="image/jpeg" sizes="16x16" href="{{ asset('frontend/images/loogo.jpeg?v=' . time()) }}">
+    <link rel="shortcut icon" href="{{ asset('frontend/images/loogo.jpeg?v=' . time()) }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/images/loogo.jpeg?v=' . time()) }}">
 
     {{-- <link rel="manifest" href="{{ asset('favicon/site.webmanifest') }}"> --}}
 

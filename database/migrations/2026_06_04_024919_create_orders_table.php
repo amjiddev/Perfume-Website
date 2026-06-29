@@ -23,7 +23,11 @@ return new class extends Migration
             $table->json('products');
             $table->decimal('total', 10, 2);
             $table->text('notes')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'confirmed', 'cancelled'])->default('pending');
+            $table->boolean('viewed')->default(false);
+            $table->string('payment_method')->nullable();
+            $table->string('payment_status')->default('pending');
+            $table->string('transaction_id')->nullable();
             $table->timestamps();
         });
     }

@@ -15,6 +15,12 @@
     <meta property="og:title" content="" />
     <link rel="canonical" href="{{ url()->current() }}" />
 
+    <!-- Favicon - Direct link for immediate loading -->
+    <link rel="icon" type="image/jpeg" href="{{ asset('favicon.ico?v=' . time()) }}">
+    <link rel="icon" type="image/jpeg" sizes="32x32" href="{{ asset('favicon.ico?v=' . time()) }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico?v=' . time()) }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon.ico?v=' . time()) }}">
+
     {!! includeFavicon() !!}
 
     <!--begin::Fonts-->

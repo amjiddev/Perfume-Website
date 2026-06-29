@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Apps\AboutPageController;
 use App\Http\Controllers\Apps\ContactPageController;
+use App\Http\Controllers\Apps\EmailSubscriptionController;
 use App\Http\Controllers\Apps\FooterSettingsController;
 use App\Http\Controllers\Apps\GuestGiftController;
 use App\Http\Controllers\Apps\HomePageController;
@@ -136,11 +137,26 @@ Route::middleware(['admin_or_redirect'])->group(function () {
         Route::post('{message}/mark-read', 'markAsRead')->name('mark-read');
         Route::delete('{message}', 'destroy')->name('destroy');
     });
+
+    Route::controller(\App\Http\Controllers\Apps\EmailSubscriptionController::class)->prefix('admin/email-subscriptions')->as('admin.email-subscriptions.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::delete('{subscription}', 'destroy')->name('destroy');
+    });
 });
 
 Route::get('/error', function () {
     abort(500);
 });
+
+// Payment Routes
+Route::get('/payment/success', [\App\Http\Controllers\Api\PaymentController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/payment/cancel', [\App\Http\Controllers\Api\PaymentController::class, 'paymentCancel'])->name('payment.cancel');
+Route::get('/checkout/success', function () {
+    return view('frontend.checkout-success');
+})->name('checkout.success');
+Route::get('/checkout/failure', function () {
+    return view('frontend.checkout-failure');
+})->name('checkout.failure');
 
 Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
 

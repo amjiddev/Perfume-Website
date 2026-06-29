@@ -21,10 +21,14 @@ class Order extends Model
         'notes',
         'status',
         'viewed',
+        'payment_method',
+        'payment_status',
+        'transaction_id',
     ];
 
     protected $casts = [
         'products' => 'array',
+        'viewed' => 'boolean',
     ];
 }
 

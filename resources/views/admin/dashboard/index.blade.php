@@ -153,12 +153,17 @@
 
     <!-- Email Subscriptions Section -->
     <div class="section email-subscriptions-section">
-        <h2 class="section-title">
-            <i class="fas fa-envelope"></i> Email Subscriptions
+        <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>
+                <i class="fas fa-envelope"></i> Email Subscriptions
+            </span>
+            <a href="{{ route('admin.email-subscriptions.index') }}" class="btn btn-sm btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem;">
+                <i class="fas fa-eye"></i> View All
+            </a>
         </h2>
 
         <div class="subscription-list">
-            <h5>Total Subscribers: <span class="subscriber-count">{{ count($emailSubscriptions) }}</span></h5>
+            <h5>Total Subscribers: <span class="subscriber-count">{{ $totalSubscriptions }}</span> (Showing Latest 6)</h5>
             <div class="subscribers-table">
                 <div class="table-responsive">
                     <table class="table">

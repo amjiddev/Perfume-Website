@@ -1,7 +1,7 @@
 <x-auth-layout>
 
     <!--begin::Form-->
-    <form class="form w-100" novalidate="novalidate" id="kt_new_password_form" data-kt-redirect-url="{{ route('login') }}" action="{{ route('password.update') }}">
+    <form class="form w-100" novalidate="novalidate" id="kt_new_password_form" data-kt-redirect-url="{{ route('login') }}" action="{{ route('password.update') }}" method="POST">
         @csrf
 
         <!-- Password Reset Token -->
@@ -90,7 +90,7 @@
 
         <!--begin::Actions-->
         <div class="d-flex flex-wrap justify-content-center pb-lg-0">
-            <button type="button" id="kt_new_password_submit" class="btn btn-primary me-4">
+            <button type="submit" id="kt_new_password_submit" class="btn btn-primary me-4">
                 @include('partials/general/_button-indicator', ['label' => 'Submit'])
             </button>
 

@@ -85,6 +85,15 @@
                     <span class="menu-title">{{ __('Messages') }}</span>
                 </a>
             </div>
+            <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('admin.email-subscriptions.*') ? 'active' : '' }}"
+                    href="{{ route('admin.email-subscriptions.index') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">{{ __('Email Subscriptions') }}</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>

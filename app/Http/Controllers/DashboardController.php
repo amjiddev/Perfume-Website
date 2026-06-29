@@ -25,8 +25,9 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
         
-        // Get email subscriptions
-        $emailSubscriptions = EmailSubscription::orderBy('created_at', 'desc')->get();
+        // Get email subscriptions (latest 6)
+        $emailSubscriptions = EmailSubscription::orderBy('created_at', 'desc')->limit(6)->get();
+        $totalSubscriptions = EmailSubscription::count();
         
         // Get unviewed pending orders
         $orderNotifications = Order::where('status', 'pending')
@@ -94,6 +95,7 @@ class DashboardController extends Controller
             'rejectedOrders' => $rejectedOrders,
             'orders' => $orders,
             'emailSubscriptions' => $emailSubscriptions,
+            'totalSubscriptions' => $totalSubscriptions,
             'notifications' => $notifications,
             'dailyLabels' => json_encode([]),
             'dailyData' => json_encode([]),

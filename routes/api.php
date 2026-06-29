@@ -123,3 +123,9 @@ Route::post('/orders/{orderId}/mark-viewed', [\App\Http\Controllers\Api\OrderCon
 Route::delete('/orders/{orderId}', [\App\Http\Controllers\Api\OrderController::class, 'destroy'])->name('api.orders.destroy');
 Route::get('/orders-by-status', [\App\Http\Controllers\Api\OrderController::class, 'getByStatus'])->name('api.orders.by-status');
 Route::get('/status-counts', [\App\Http\Controllers\Api\OrderController::class, 'getStatusCounts'])->name('api.status-counts');
+
+// SafePay Payment Routes
+Route::post('/payments/initiate', [\App\Http\Controllers\Api\PaymentController::class, 'initiatePayment'])->name('api.payments.initiate');
+Route::post('/payments/webhook', [\App\Http\Controllers\Api\PaymentController::class, 'webhook'])->name('api.payments.webhook')->withoutMiddleware('api');
+Route::get('/payments/health', [\App\Http\Controllers\Api\PaymentController::class, 'healthCheck'])->name('api.payments.health');
+
