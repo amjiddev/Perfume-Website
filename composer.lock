@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69803eed26c6056749c3f6f2f605ac4b",
+    "content-hash": "a395a2687bbde6729347472fb004bd83",
     "packages": [
         {
             "name": "bardolf69/laravel11-countries-states-cities",
@@ -3402,6 +3402,86 @@
                 }
             ],
             "time": "2024-12-06T06:17:37+00:00"
+        },
+        {
+            "name": "pak-pay/pak-pay",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imabbas8/pak-pay.git",
+                "reference": "2b713c9be902fdce35ddf193b1744a4bf47e9638"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imabbas8/pak-pay/zipball/2b713c9be902fdce35ddf193b1744a4bf47e9638",
+                "reference": "2b713c9be902fdce35ddf193b1744a4bf47e9638",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.2",
+                "illuminate/contracts": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "illuminate/http": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "illuminate/support": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0",
+                "pestphp/pest": "^1.21 || ^2.0 || ^3.0",
+                "pestphp/pest-plugin-laravel": "^1.1 || ^2.0 || ^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "PakPay": "PakPay\\PakPay\\Facades\\PakPay"
+                    },
+                    "providers": [
+                        "PakPay\\PakPay\\PakPayServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PakPay\\PakPay\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Abbas Aslam",
+                    "email": "imabbasaslam8@gmail.com",
+                    "homepage": "https://github.com/imabbas8",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Debug Flow",
+                    "email": "support@debugflow.com",
+                    "homepage": "https://debugflow.com",
+                    "role": "Company"
+                }
+            ],
+            "description": "A single unified Laravel API for accepting payments through Pakistani payment gateways (JazzCash, EasyPaisa, Safepay, NayaPay, PayFast, Raast).",
+            "homepage": "https://github.com/imabbas8/pak-pay",
+            "keywords": [
+                "easypaisa",
+                "jazzcash",
+                "laravel",
+                "nayapay",
+                "pakistan",
+                "payfast",
+                "payment-gateway",
+                "payments",
+                "raast",
+                "safepay"
+            ],
+            "support": {
+                "issues": "https://github.com/imabbas8/pak-pay/issues",
+                "source": "https://github.com/imabbas8/pak-pay"
+            },
+            "time": "2026-06-16T05:10:21+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -10281,12 +10361,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

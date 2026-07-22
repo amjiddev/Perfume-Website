@@ -1,44 +1,46 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Payment Failed - Almukhtar Perfume')
+@section('title', 'Payment Successful - Almukhtar Perfume')
 
 @section('content')
-<section class="checkout-failure-section">
+<section class="payment-success-section">
     <div class="container">
-        <div class="failure-container">
-            <div class="failure-icon">
-                <i class="fas fa-times-circle"></i>
+        <div class="success-container">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
             </div>
             
-            <h1 class="failure-title">Payment Failed</h1>
+            <h1 class="success-title">Payment Successful!</h1>
             
-            <div class="failure-message">
-                <p>{{ session('error') ?? 'Your payment could not be processed.' }}</p>
+            <div class="success-message">
+                <p>Your payment has been processed successfully.</p>
                 <p class="order-id">
                     Order ID: <strong>{{ request('order_id') ?? 'N/A' }}</strong>
                 </p>
             </div>
 
-            <div class="failure-details">
-                <h3>What You Can Do:</h3>
+            <div class="success-details">
+                <h3>What's Next?</h3>
                 <ul>
-                    <li><i class="fas fa-redo"></i> Try the payment again with the same or different method</li>
-                    <li><i class="fas fa-phone"></i> Contact our support team for assistance</li>
+                    <li><i class="fas fa-envelope"></i> You will receive a confirmation email shortly</li>
+                    <li><i class="fas fa-truck"></i> Your order will be processed and shipped soon</li>
+                    <li><i class="fas fa-tracking"></i> You can track your order using the order ID</li>
+                    <li><i class="fas fa-headset"></i> Contact our support team if you need assistance</li>
                 </ul>
             </div>
 
-            <div class="failure-actions">
+            <div class="success-actions">
                 <a href="{{ route('shop') }}" class="btn btn-primary-custom">
-                    <i class="fas fa-arrow-left"></i> Back to Checkout
+                    <i class="fas fa-shopping-bag"></i> Continue Shopping
                 </a>
-                <a href="{{ route('contact') }}" class="btn btn-secondary-custom">
-                    <i class="fas fa-headset"></i> Contact Support
+                <a href="/" class="btn btn-secondary-custom">
+                    <i class="fas fa-home"></i> Back to Home
                 </a>
             </div>
 
-            <div class="failure-footer">
+            <div class="success-footer">
                 <p class="text-muted">
-                    Your cart has been saved. Your items are still available.
+                    Thank you for your purchase!
                 </p>
                 <p class="text-muted">
                     <strong>Need help?</strong> <a href="mailto:{{ config('app.support_email', 'support@almukhtar.com') }}">Email us</a> or call us for assistance.
@@ -49,46 +51,46 @@
 </section>
 
 <style>
-    .checkout-failure-section {
+    .payment-success-section {
         padding: 4rem 0;
-        background: linear-gradient(135deg, #fff5f5 0%, #f9f9f9 100%);
+        background: linear-gradient(135deg, #f5fff5 0%, #f9f9f9 100%);
         min-height: 100vh;
         display: flex;
         align-items: center;
     }
 
-    .failure-container {
+    .success-container {
         background: white;
         padding: 3rem 2rem;
         border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(255, 68, 68, 0.15);
+        box-shadow: 0 10px 40px rgba(76, 175, 80, 0.15);
         text-align: center;
         max-width: 500px;
         margin: 0 auto;
-        border-left: 5px solid #ff4444;
+        border-left: 5px solid #4caf50;
     }
 
-    .failure-icon {
+    .success-icon {
         font-size: 5rem;
-        color: #ff4444;
+        color: #4caf50;
         margin-bottom: 1.5rem;
-        animation: shake 0.5s ease-out;
+        animation: scaleIn 0.5s ease-out;
     }
 
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-10px); }
-        75% { transform: translateX(10px); }
+    @keyframes scaleIn {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
     }
 
-    .failure-title {
+    .success-title {
         font-size: 2rem;
         color: #000000;
         margin-bottom: 1rem;
         font-weight: 700;
     }
 
-    .failure-message {
+    .success-message {
         margin-bottom: 2rem;
         font-size: 1.1rem;
         color: #666666;
@@ -96,33 +98,33 @@
 
     .order-id {
         font-size: 1rem;
-        color: #ff4444;
+        color: #4caf50;
         font-weight: 600;
         margin-top: 0.8rem;
     }
 
-    .failure-details {
-        background: #fff5f5;
+    .success-details {
+        background: #f5fff5;
         padding: 2rem;
         border-radius: 8px;
         margin-bottom: 2rem;
         text-align: left;
     }
 
-    .failure-details h3 {
+    .success-details h3 {
         font-size: 1.1rem;
         color: #000000;
         font-weight: 700;
         margin-bottom: 1rem;
     }
 
-    .failure-details ul {
+    .success-details ul {
         list-style: none;
         padding: 0;
         margin: 0;
     }
 
-    .failure-details li {
+    .success-details li {
         display: flex;
         align-items: center;
         gap: 0.8rem;
@@ -131,12 +133,12 @@
         font-size: 0.95rem;
     }
 
-    .failure-details li i {
-        color: #ff4444;
+    .success-details li i {
+        color: #4caf50;
         font-size: 1.1rem;
     }
 
-    .failure-actions {
+    .success-actions {
         display: flex;
         gap: 1rem;
         margin-bottom: 2rem;
@@ -158,64 +160,64 @@
     }
 
     .btn-primary-custom {
-        background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
         color: white;
         border: none;
     }
 
     .btn-primary-custom:hover {
-        background: linear-gradient(135deg, #ff5252 0%, #ff3333 100%);
+        background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
     }
 
     .btn-secondary-custom {
         background: white;
-        color: #ff4444;
-        border: 2px solid #ff4444;
+        color: #4caf50;
+        border: 2px solid #4caf50;
     }
 
     .btn-secondary-custom:hover {
-        background: #fff5f5;
-        border-color: #ff3333;
-        color: #ff3333;
+        background: #f5fff5;
+        border-color: #45a049;
+        color: #45a049;
         transform: translateY(-2px);
     }
 
-    .failure-footer {
+    .success-footer {
         border-top: 1px solid #e0e0e0;
         padding-top: 1.5rem;
     }
 
-    .failure-footer a {
-        color: #ff4444;
+    .success-footer a {
+        color: #4caf50;
         text-decoration: none;
         font-weight: 600;
     }
 
-    .failure-footer a:hover {
+    .success-footer a:hover {
         text-decoration: underline;
     }
 
     @media (max-width: 768px) {
-        .checkout-failure-section {
+        .payment-success-section {
             padding: 2rem 0;
         }
 
-        .failure-container {
+        .success-container {
             padding: 1.5rem 1rem;
-            border-left: 3px solid #ff4444;
+            border-left: 3px solid #4caf50;
         }
 
-        .failure-icon {
+        .success-icon {
             font-size: 3rem;
         }
 
-        .failure-title {
+        .success-title {
             font-size: 1.5rem;
         }
 
-        .failure-actions {
+        .success-actions {
             flex-direction: column;
         }
 

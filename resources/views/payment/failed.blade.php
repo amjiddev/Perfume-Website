@@ -3,40 +3,39 @@
 @section('title', 'Payment Failed - Almukhtar Perfume')
 
 @section('content')
-<section class="checkout-failure-section">
+<section class="payment-failed-section">
     <div class="container">
-        <div class="failure-container">
-            <div class="failure-icon">
+        <div class="failed-container">
+            <div class="failed-icon">
                 <i class="fas fa-times-circle"></i>
             </div>
             
-            <h1 class="failure-title">Payment Failed</h1>
+            <h1 class="failed-title">Payment Failed</h1>
             
-            <div class="failure-message">
+            <div class="failed-message">
                 <p>{{ session('error') ?? 'Your payment could not be processed.' }}</p>
-                <p class="order-id">
-                    Order ID: <strong>{{ request('order_id') ?? 'N/A' }}</strong>
-                </p>
             </div>
 
-            <div class="failure-details">
+            <div class="failed-details">
                 <h3>What You Can Do:</h3>
                 <ul>
                     <li><i class="fas fa-redo"></i> Try the payment again with the same or different method</li>
+                    <li><i class="fas fa-check"></i> Verify your payment details are correct</li>
                     <li><i class="fas fa-phone"></i> Contact our support team for assistance</li>
+                    <li><i class="fas fa-arrow-left"></i> Go back and review your order</li>
                 </ul>
             </div>
 
-            <div class="failure-actions">
+            <div class="failed-actions">
                 <a href="{{ route('shop') }}" class="btn btn-primary-custom">
-                    <i class="fas fa-arrow-left"></i> Back to Checkout
+                    <i class="fas fa-redo"></i> Try Again
                 </a>
                 <a href="{{ route('contact') }}" class="btn btn-secondary-custom">
                     <i class="fas fa-headset"></i> Contact Support
                 </a>
             </div>
 
-            <div class="failure-footer">
+            <div class="failed-footer">
                 <p class="text-muted">
                     Your cart has been saved. Your items are still available.
                 </p>
@@ -49,7 +48,7 @@
 </section>
 
 <style>
-    .checkout-failure-section {
+    .payment-failed-section {
         padding: 4rem 0;
         background: linear-gradient(135deg, #fff5f5 0%, #f9f9f9 100%);
         min-height: 100vh;
@@ -57,7 +56,7 @@
         align-items: center;
     }
 
-    .failure-container {
+    .failed-container {
         background: white;
         padding: 3rem 2rem;
         border-radius: 12px;
@@ -68,7 +67,7 @@
         border-left: 5px solid #ff4444;
     }
 
-    .failure-icon {
+    .failed-icon {
         font-size: 5rem;
         color: #ff4444;
         margin-bottom: 1.5rem;
@@ -81,27 +80,20 @@
         75% { transform: translateX(10px); }
     }
 
-    .failure-title {
+    .failed-title {
         font-size: 2rem;
         color: #000000;
         margin-bottom: 1rem;
         font-weight: 700;
     }
 
-    .failure-message {
+    .failed-message {
         margin-bottom: 2rem;
         font-size: 1.1rem;
         color: #666666;
     }
 
-    .order-id {
-        font-size: 1rem;
-        color: #ff4444;
-        font-weight: 600;
-        margin-top: 0.8rem;
-    }
-
-    .failure-details {
+    .failed-details {
         background: #fff5f5;
         padding: 2rem;
         border-radius: 8px;
@@ -109,20 +101,20 @@
         text-align: left;
     }
 
-    .failure-details h3 {
+    .failed-details h3 {
         font-size: 1.1rem;
         color: #000000;
         font-weight: 700;
         margin-bottom: 1rem;
     }
 
-    .failure-details ul {
+    .failed-details ul {
         list-style: none;
         padding: 0;
         margin: 0;
     }
 
-    .failure-details li {
+    .failed-details li {
         display: flex;
         align-items: center;
         gap: 0.8rem;
@@ -131,12 +123,12 @@
         font-size: 0.95rem;
     }
 
-    .failure-details li i {
+    .failed-details li i {
         color: #ff4444;
         font-size: 1.1rem;
     }
 
-    .failure-actions {
+    .failed-actions {
         display: flex;
         gap: 1rem;
         margin-bottom: 2rem;
@@ -182,40 +174,40 @@
         transform: translateY(-2px);
     }
 
-    .failure-footer {
+    .failed-footer {
         border-top: 1px solid #e0e0e0;
         padding-top: 1.5rem;
     }
 
-    .failure-footer a {
+    .failed-footer a {
         color: #ff4444;
         text-decoration: none;
         font-weight: 600;
     }
 
-    .failure-footer a:hover {
+    .failed-footer a:hover {
         text-decoration: underline;
     }
 
     @media (max-width: 768px) {
-        .checkout-failure-section {
+        .payment-failed-section {
             padding: 2rem 0;
         }
 
-        .failure-container {
+        .failed-container {
             padding: 1.5rem 1rem;
             border-left: 3px solid #ff4444;
         }
 
-        .failure-icon {
+        .failed-icon {
             font-size: 3rem;
         }
 
-        .failure-title {
+        .failed-title {
             font-size: 1.5rem;
         }
 
-        .failure-actions {
+        .failed-actions {
             flex-direction: column;
         }
 
