@@ -20,6 +20,7 @@ class Order extends Model
         'total',
         'notes',
         'status',
+        'payment_method',
         'viewed',
     ];
 

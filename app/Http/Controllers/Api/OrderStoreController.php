@@ -25,6 +25,8 @@ class OrderStoreController extends Controller
                 'products' => 'required|array|min:1',
                 'total' => 'required|numeric|min:0',
                 'notes' => 'nullable|string',
+                // Only COD supported now
+                'payment_method' => 'nullable|string|in:cod',
                 'status' => 'nullable|in:pending,approved,rejected',
             ]);
 
@@ -41,6 +43,7 @@ class OrderStoreController extends Controller
                 'total' => $validated['total'],
                 'notes' => $validated['notes'] ?? null,
                 'status' => $validated['status'] ?? 'pending',
+                'payment_method' => $validated['payment_method'] ?? 'cod',
             ]);
 
             // Send order confirmation email

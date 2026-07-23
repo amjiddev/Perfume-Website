@@ -158,12 +158,7 @@ Route::get('/checkout/failure', function () {
 
 Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
 
-// Payment Routes
-Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment'])->name('payment.initiate');
-Route::post('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
-Route::post('/payment/status', [PaymentController::class, 'checkStatus'])->name('payment.status');
-Route::get('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
-Route::get('/payment/failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
+// Payment routes removed — payment processing disabled (COD-only)
 
 require __DIR__ . '/auth.php';
 

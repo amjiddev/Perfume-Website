@@ -70,35 +70,8 @@
                                 <textarea class="form-control" id="notes" name="notes" rows="4" placeholder="Any special instructions or notes for your order..."></textarea>
                             </div>
 
-                            <!-- Payment Method Selection -->
-                            <h3 class="section-heading mt-5">Payment Method</h3>
-                            <div class="payment-methods">
-                                <div class="payment-option">
-                                    <input type="radio" id="payment_jazzcash" name="paymentMethod" value="jazzcash" checked>
-                                    <label for="payment_jazzcash" class="payment-label">
-                                        <div class="payment-icon">
-                                            <i class="fas fa-mobile-alt"></i>
-                                        </div>
-                                        <div class="payment-details">
-                                            <h6>JazzCash</h6>
-                                            <p class="text-muted small">Fast & secure mobile payment</p>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                <div class="payment-option">
-                                    <input type="radio" id="payment_easypaisa" name="paymentMethod" value="easypaisa">
-                                    <label for="payment_easypaisa" class="payment-label">
-                                        <div class="payment-icon">
-                                            <i class="fas fa-wallet"></i>
-                                        </div>
-                                        <div class="payment-details">
-                                            <h6>EasyPaisa</h6>
-                                            <p class="text-muted small">Pay through EasyPaisa account</p>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
+                            <!-- Payment Method: Cash on Delivery only -->
+                            <input type="hidden" id="paymentMethodInput" name="paymentMethod" value="cod">
 
                             <button type="submit" class="btn btn-place-order">Proceed to Payment</button>
                             <div id="formValidationError" class="alert alert-danger mt-3" style="display: none;"></div>
@@ -473,6 +446,18 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadCartItems();
 
+            // Update place order button text based on selected payment method
+            const updatePlaceOrderText = () => {
+                const btn = document.querySelector('.btn-place-order');
+                const selected = document.getElementById('paymentMethodInput')?.value || 'cod';
+                if (btn) {
+                    btn.textContent = selected === 'cod' ? 'Place Order (COD)' : 'Proceed to Payment';
+                }
+            };
+
+            // No payment radios (COD-only), just set initial text
+            updatePlaceOrderText();
+
             const checkoutForm = document.getElementById('checkoutForm');
             if (checkoutForm) {
                 checkoutForm.addEventListener('submit', function(e) {
@@ -489,6 +474,8 @@
                         return;
                     }
 
+                    const selectedPaymentMethod = document.getElementById('paymentMethodInput')?.value || 'cod';
+
                     const orderData = {
                         customer_name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
                         customer_email: document.getElementById('email').value,
@@ -501,7 +488,8 @@
                         notes: document.getElementById('notes').value,
                         products: cartData,
                         total: calculateTotal(),
-                        status: 'pending'
+                        status: 'pending',
+                        payment_method: selectedPaymentMethod
                     };
 
                     submitOrder(orderData);
@@ -569,12 +557,7 @@
 
         function submitOrder(orderData) {
             const btn = document.querySelector('.btn-place-order');
-            const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-            
-            if (!selectedPaymentMethod) {
-                showFormValidationError('Please select a payment method');
-                return;
-            }
+            const selectedPaymentMethod = document.getElementById('paymentMethodInput')?.value || 'cod';
 
             btn.disabled = true;
             btn.textContent = 'Processing...';
@@ -590,50 +573,19 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Store order data and redirect to payment
-                    const paymentData = {
-                        amount: orderData.total,
-                        provider: selectedPaymentMethod,
-                        customer_name: orderData.customer_name,
-                        customer_email: orderData.customer_email,
-                        customer_mobile: document.getElementById('phone')?.value || '',
-                        order_id: data.order.id,
-                    };
-
-                    // Redirect to payment initiation
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ route("payment.initiate") }}';
-                    
-                    const token = document.querySelector('meta[name="csrf-token"]')?.content;
-                    
-                    Object.keys(paymentData).forEach(key => {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = paymentData[key];
-                        form.appendChild(input);
-                    });
-
-                    const csrfInput = document.createElement('input');
-                    csrfInput.type = 'hidden';
-                    csrfInput.name = '_token';
-                    csrfInput.value = token;
-                    form.appendChild(csrfInput);
-
-                    document.body.appendChild(form);
-                    form.submit();
+                    // For COD-only flow, redirect user to checkout success page
+                    window.location.href = '{{ route("checkout.success") }}';
                 } else {
                     alert('Error: ' + (data.message || 'Failed to place order'));
                     btn.disabled = false;
-                    btn.textContent = 'Proceed to Payment';
+                    btn.textContent = 'Place Order (COD)';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error placing order: ' + error.message);
                 btn.disabled = false;
-                btn.textContent = 'Proceed to Payment';
+                btn.textContent = 'Place Order (COD)';
             });
         }
 
