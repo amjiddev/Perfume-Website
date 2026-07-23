@@ -14,8 +14,10 @@ use App\Http\Controllers\Apps\UserManagementController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingPageController;
-use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,35 +30,43 @@ Route::middleware(['admin_or_redirect'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Profile update routes
-    Route::post('/admin/profile/update', function () {
-        $user = Auth::user();
-        
-        if (request()->hasFile('profile_photo_path')) {
-            $path = request()->file('profile_photo_path')->store('profile', 'public');
+    Route::post('/admin/profile/update', function (Request $request) {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        if ($request->hasFile('profile_photo_path')) {
+            $path = $request->file('profile_photo_path')->store('profile', 'public');
             $user->profile_photo_path = 'storage/' . $path;
         }
-        
-        $user->name = request('name');
-        $user->email = request('email');
+
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
         $user->save();
-        
+
         return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
     });
     
-    Route::post('/admin/password/update', function () {
-        $user = Auth::user();
-        
-        if (!Hash::check(request('current_password'), $user->password)) {
+    Route::post('/admin/password/update', function (Request $request) {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        if (! Hash::check($request->input('current_password'), $user->password)) {
             return response()->json(['success' => false, 'message' => 'Current password is incorrect']);
         }
-        
-        if (request('password') !== request('password_confirmation')) {
+
+        if ($request->input('password') !== $request->input('password_confirmation')) {
             return response()->json(['success' => false, 'message' => 'Passwords do not match']);
         }
-        
-        $user->password = Hash::make(request('password'));
+
+        $user->password = Hash::make($request->input('password'));
         $user->save();
-        
+
         return response()->json(['success' => true, 'message' => 'Password updated successfully']);
     });
 
@@ -158,7 +168,7 @@ Route::get('/checkout/failure', function () {
 
 Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
 
-// Payment routes removed — payment processing disabled (COD-only)
+// Payment Routes
 
 require __DIR__ . '/auth.php';
 

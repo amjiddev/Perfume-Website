@@ -573,7 +573,13 @@ const selectedPaymentMethod = document.getElementById('paymentMethodInput')?.val
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // For COD-only flow, redirect user to checkout success page
+                    // Clear client-side cart (localStorage) for COD flow, then redirect
+                    try {
+                        localStorage.removeItem('perfume_cart');
+                    } catch (e) {
+                        console.warn('Could not clear cart from localStorage', e);
+                    }
+
                     window.location.href = '{{ route("checkout.success") }}';
                 } else {
                     alert('Error: ' + (data.message || 'Failed to place order'));
