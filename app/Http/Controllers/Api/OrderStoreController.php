@@ -26,9 +26,15 @@ class OrderStoreController extends Controller
                 'total' => 'required|numeric|min:0',
                 'notes' => 'nullable|string',
                 // Only COD supported now
-                'payment_method' => 'nullable|string|in:cod',
+                'payment_method' => 'nullable|string|in:cod,cash_on_delivery,credit_card,jazzcash,easypaisa',
                 'status' => 'nullable|in:pending,approved,rejected',
             ]);
+
+            // Normalize alias values to the actual enum values used in the database
+            $paymentMethod = $validated['payment_method'] ?? 'cash_on_delivery';
+            if ($paymentMethod === 'cod') {
+                $paymentMethod = 'cash_on_delivery';
+            }
 
             // Create order
             $order = Order::create([
@@ -43,7 +49,7 @@ class OrderStoreController extends Controller
                 'total' => $validated['total'],
                 'notes' => $validated['notes'] ?? null,
                 'status' => $validated['status'] ?? 'pending',
-                'payment_method' => $validated['payment_method'] ?? 'cod',
+                'payment_method' => $paymentMethod,
             ]);
 
             // Send order confirmation email
