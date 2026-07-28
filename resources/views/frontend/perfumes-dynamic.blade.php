@@ -3,14 +3,37 @@
 @section('title', 'Luxury Perfumes - Buy Best Perfumes Online | Almukhtar Perfume')
 
 @section('content')
-    <!-- Hero Section -->
-    <section class="hero-section-centered" style="background-image: url('{{ asset($perfumePage->hero_image ?? 'frontend/images/perfume1.jpg') }}');">
-        <div class="hero-overlay-light"></div>
-        <div class="hero-content-centered">
-            <div class="hero-text-centered">
+    <!-- Hero Section with Carousel -->
+    <section class="hero-section" id="perfumeHeroSlider">
+        <div class="hero-slider-container">
+            @for($i = 1; $i <= 4; $i++)
+            <div class="hero-slide {{ $i === 1 ? 'active' : '' }}" id="perfumeHeroSlide{{ $i }}" style="background-image: url('{{ asset($perfumePage->{'hero_image_' . $i} ?? 'frontend/images/perfume' . $i . '.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            @endfor
+        </div>
+        
+        <div class="hero-overlay"></div>
+        
+        <div class="hero-content">
+            <div class="hero-text">
                 <h1>{{ $perfumePage->hero_heading ?? 'Luxury Perfumes' }}</h1>
                 <p>{{ $perfumePage->hero_subheading ?? 'Discover long-lasting premium fragrances crafted for the modern individual' }}</p>
             </div>
+        </div>
+
+        <!-- Slider Controls -->
+        <button class="slider-btn slider-btn-left" onclick="changePerfumeSlide(-1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-btn slider-btn-right" onclick="changePerfumeSlide(1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Slider Indicators -->
+        <div class="hero-slider-indicators">
+            <span class="indicator active" onclick="currentPerfumeSlide(0)"></span>
+            <span class="indicator" onclick="currentPerfumeSlide(1)"></span>
+            <span class="indicator" onclick="currentPerfumeSlide(2)"></span>
+            <span class="indicator" onclick="currentPerfumeSlide(3)"></span>
         </div>
     </section>
 
@@ -29,7 +52,7 @@
                         </div>
                         <div class="product-info">
                             <h5>{{ $perfume->name }}</h5>
-                            <p class="product-desc">{{ implode(' ', array_slice(explode(' ', $perfume->description), 0, 3)) }}...</p>
+                            <p class="product-desc">{{ implode(' ', array_slice(explode(' ', $perfume->description ?? ''), 0, 3)) }}...</p>
                             <div class="rating-perfume">
                                 @for($i = 0; $i < floor($perfume->rating); $i++)
                                     <i class="fas fa-star" style="color: #FFD700;"></i>
@@ -475,6 +498,88 @@
                 btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
                 btn.classList.remove('expanded');
             }
+        }
+
+        // ================================================
+        // PERFUME HERO SLIDER
+        // ================================================
+        let currentPerfumeSlideIndex = 0;
+        let perfumeAutoSlideTimer = null;
+        let perfumeSlides, perfumeIndicators, perfumeTotalSlides;
+
+        function initializePerfumeSlider() {
+            const sliderId = 'perfumeHeroSlider';
+            perfumeSlides = document.querySelectorAll(`#${sliderId} .hero-slide`);
+            perfumeIndicators = document.querySelectorAll(`#${sliderId} .indicator`);
+            perfumeTotalSlides = perfumeSlides.length;
+
+            if (perfumeTotalSlides > 0) {
+                startPerfumeAutoSlide();
+                console.log('Perfume slider initialized with', perfumeTotalSlides, 'slides');
+            }
+        }
+
+        function showPerfumeSlide(n) {
+            if (!perfumeSlides || perfumeSlides.length === 0) return;
+
+            if (n >= perfumeTotalSlides) {
+                currentPerfumeSlideIndex = 0;
+            } else if (n < 0) {
+                currentPerfumeSlideIndex = perfumeTotalSlides - 1;
+            } else {
+                currentPerfumeSlideIndex = n;
+            }
+
+            perfumeSlides.forEach(slide => slide.classList.remove('active'));
+            perfumeIndicators.forEach(indicator => indicator.classList.remove('active'));
+
+            if (perfumeSlides[currentPerfumeSlideIndex]) {
+                perfumeSlides[currentPerfumeSlideIndex].classList.add('active');
+            }
+            if (perfumeIndicators[currentPerfumeSlideIndex]) {
+                perfumeIndicators[currentPerfumeSlideIndex].classList.add('active');
+            }
+
+            console.log('Perfume slide:', currentPerfumeSlideIndex);
+        }
+
+        function autoSlidePerfume() {
+            if (perfumeTotalSlides > 0) {
+                currentPerfumeSlideIndex = (currentPerfumeSlideIndex + 1) % perfumeTotalSlides;
+                showPerfumeSlide(currentPerfumeSlideIndex);
+            }
+        }
+
+        function startPerfumeAutoSlide() {
+            if (perfumeAutoSlideTimer) clearInterval(perfumeAutoSlideTimer);
+            perfumeAutoSlideTimer = setInterval(autoSlidePerfume, 5000);
+            console.log('Perfume auto slide started');
+        }
+
+        function stopPerfumeAutoSlide() {
+            if (perfumeAutoSlideTimer) {
+                clearInterval(perfumeAutoSlideTimer);
+                perfumeAutoSlideTimer = null;
+            }
+        }
+
+        function changePerfumeSlide(n) {
+            stopPerfumeAutoSlide();
+            showPerfumeSlide(currentPerfumeSlideIndex + n);
+            startPerfumeAutoSlide();
+        }
+
+        function currentPerfumeSlide(n) {
+            stopPerfumeAutoSlide();
+            showPerfumeSlide(n);
+            startPerfumeAutoSlide();
+        }
+
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePerfumeSlider);
+        } else {
+            initializePerfumeSlider();
         }
     </script>
 @endsection

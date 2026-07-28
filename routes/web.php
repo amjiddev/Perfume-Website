@@ -168,6 +168,28 @@ Route::get('/checkout/failure', function () {
 
 Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirect']);
 
+// Temporary migration route - can be removed after migrations run
+Route::get('/admin/run-migrations-temp', function () {
+    if (!env('APP_DEBUG')) {
+        abort(403);
+    }
+    
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Migrations completed successfully',
+            'output' => \Illuminate\Support\Facades\Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Migration failed: ' . $e->getMessage(),
+            'error' => $e
+        ], 500);
+    }
+});
+
 // Payment Routes
 
 require __DIR__ . '/auth.php';

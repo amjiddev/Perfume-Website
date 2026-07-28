@@ -76,6 +76,8 @@ class LandingPageController extends Controller
                 'hero_subheading' => 'required|string',
                 'hero_image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'hero_image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'hero_image_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'hero_image_4' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'about_heading' => 'required|string|max:255',
                 'about_description' => 'required|string',
                 'about_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -84,7 +86,7 @@ class LandingPageController extends Controller
                 'company_name' => 'required|string|max:255',
                 'company_description' => 'required|string',
                 'facebook_url' => 'nullable|url',
-                'instagram_url' => 'nullable|url',
+                'youtube_url' => 'nullable|url',
                 'tiktok_url' => 'nullable|url',
             ]);
 
@@ -117,6 +119,30 @@ class LandingPageController extends Controller
                     $validated['hero_image_2'] = 'uploads/home-page/' . $filename;
                 }
 
+                // Handle hero image 3
+                if ($request->hasFile('hero_image_3')) {
+                    if ($homePage->hero_image_3 && file_exists(public_path($homePage->hero_image_3))) {
+                        unlink(public_path($homePage->hero_image_3));
+                    }
+                    
+                    $file = $request->file('hero_image_3');
+                    $filename = 'hero-3-' . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/home-page'), $filename);
+                    $validated['hero_image_3'] = 'uploads/home-page/' . $filename;
+                }
+
+                // Handle hero image 4
+                if ($request->hasFile('hero_image_4')) {
+                    if ($homePage->hero_image_4 && file_exists(public_path($homePage->hero_image_4))) {
+                        unlink(public_path($homePage->hero_image_4));
+                    }
+                    
+                    $file = $request->file('hero_image_4');
+                    $filename = 'hero-4-' . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/home-page'), $filename);
+                    $validated['hero_image_4'] = 'uploads/home-page/' . $filename;
+                }
+
                 // Handle about image
                 if ($request->hasFile('about_image')) {
                     if ($homePage->about_image && file_exists(public_path($homePage->about_image))) {
@@ -138,7 +164,7 @@ class LandingPageController extends Controller
                 'company_name' => $validated['company_name'],
                 'company_description' => $validated['company_description'],
                 'facebook_url' => $validated['facebook_url'] ?? null,
-                'instagram_url' => $validated['instagram_url'] ?? null,
+                'youtube_url' => $validated['youtube_url'] ?? null,
                 'tiktok_url' => $validated['tiktok_url'] ?? null,
             ];
 
@@ -162,7 +188,7 @@ class LandingPageController extends Controller
     {
         try {
             $request->validate([
-                'image_field' => 'required|in:hero_image_1,hero_image_2,about_image',
+                'image_field' => 'required|in:hero_image_1,hero_image_2,hero_image_3,hero_image_4,about_image',
             ]);
 
             $imageField = $request->input('image_field');

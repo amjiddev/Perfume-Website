@@ -21,7 +21,7 @@ Attar Page Settings
                     <!-- Hero Section -->
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h6 class="card-title mb-0">Hero Section</h6>
+                            <h6 class="card-title mb-0">Hero Section (4 Auto-Changing Images)</h6>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
@@ -44,28 +44,27 @@ Attar Page Settings
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="hero_image" class="form-label">Hero Background Image</label>
-                                <input type="file" class="form-control @error('hero_image') is-invalid @enderror" 
-                                       id="hero_image" name="hero_image" accept="image/*">
-                                @error('hero_image')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                
-                                @if($attarPage->hero_image)
-                                    <div class="mt-2">
-                                        <small class="text-muted">Current image:</small>
-                                        <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
-                                            <img src="{{ asset($attarPage->hero_image) }}" alt="Hero" style="max-width: 200px; display: block;">
-                                            <button type="button" class="btn btn-danger" 
-                                                    onclick="deletePageImage('attar_page', 'hero_image')" 
-                                                    title="Remove image" 
-                                                    style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-                                                ×
-                                            </button>
+                            <div class="row">
+                                @for($i = 1; $i <= 4; $i++)
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="hero_image_{{ $i }}" class="form-label">Hero Image {{ $i }}</label>
+                                        <input type="file" class="form-control" id="hero_image_{{ $i }}" name="hero_image_{{ $i }}" accept="image/*">
+                                        @php $heroImage = 'hero_image_' . $i; @endphp
+                                        @if($attarPage->$heroImage)
+                                        <div class="mt-2">
+                                            <small class="text-muted">Current image:</small>
+                                            <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
+                                                <img src="{{ asset($attarPage->$heroImage) }}" alt="Hero {{ $i }}" style="max-width: 200px; max-height: 150px; display: block;">
+                                                <button type="button" class="btn btn-danger" onclick="deletePageImage('attar_page', '{{ $heroImage }}')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                    ×
+                                                </button>
+                                            </div>
                                         </div>
+                                        @endif
                                     </div>
-                                @endif
+                                </div>
+                                @endfor
                             </div>
                         </div>
                     </div>

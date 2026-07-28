@@ -29,6 +29,10 @@ class PerfumePageController extends Controller
             'hero_heading' => 'nullable|string|max:255',
             'hero_subheading' => 'nullable|string',
             'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'hero_image_4' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'best_sellers_title' => 'nullable|string|max:255',
             'best_sellers_subtitle' => 'nullable|string|max:255',
         ]);
@@ -37,21 +41,68 @@ class PerfumePageController extends Controller
         if (!$perfumePage) {
             $perfumePage = PerfumePage::create($validated);
         } else {
+            // Handle old hero_image field
             if ($request->hasFile('hero_image')) {
+                // Delete old image
                 if ($perfumePage->hero_image && file_exists(public_path($perfumePage->hero_image))) {
                     unlink(public_path($perfumePage->hero_image));
                 }
                 
                 $file = $request->file('hero_image');
-                $filename = 'perfume-hero-' . time() . '.' . $file->getClientOriginalExtension();
+                $uniqueId = uniqid() . '-' . time();
+                $filename = 'perfume-hero-' . $uniqueId . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/perfume'), $filename);
                 $validated['hero_image'] = 'uploads/perfume/' . $filename;
+            }
+            
+            // Handle 4 carousel images
+            for ($i = 1; $i <= 4; $i++) {
+                $fieldName = 'hero_image_' . $i;
+                if ($request->hasFile($fieldName)) {
+                    // Delete old image(s) - delete all versions of this image
+                    if ($perfumePage->$fieldName && file_exists(public_path($perfumePage->$fieldName))) {
+                        unlink(public_path($perfumePage->$fieldName));
+                    }
+                    
+                    // Also clean up any other versions of this carousel image
+                    $this->deleteOldCarouselImages('uploads/perfume', 'perfume-hero-' . $i);
+                    
+                    $file = $request->file($fieldName);
+                    $uniqueId = uniqid() . '-' . time();
+                    $filename = 'perfume-hero-' . $i . '-' . $uniqueId . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/perfume'), $filename);
+                    $validated[$fieldName] = 'uploads/perfume/' . $filename;
+                }
             }
             
             $perfumePage->update($validated);
         }
 
         return redirect()->back()->with('success', 'Perfume page settings updated successfully!');
+    }
+
+    /**
+     * Delete all old versions of carousel images
+     */
+    private function deleteOldCarouselImages($directory, $prefix)
+    {
+        $fullPath = public_path($directory);
+        
+        if (!is_dir($fullPath)) {
+            return;
+        }
+
+        $files = glob($fullPath . '/' . $prefix . '-*.{jpg,jpeg,png,gif,jfif}', GLOB_BRACE);
+        
+        foreach ((array)$files as $file) {
+            if (file_exists($file) && is_file($file)) {
+                try {
+                    unlink($file);
+                } catch (\Exception $e) {
+                    // Log but don't fail if we can't delete a file
+                }
+            }
+        }
     }
 
     public function storePerfume(Request $request)
@@ -152,7 +203,7 @@ class PerfumePageController extends Controller
     {
         try {
             $request->validate([
-                'image_field' => 'required|in:hero_image',
+                'image_field' => 'required|in:hero_image,hero_image_1,hero_image_2,hero_image_3,hero_image_4',
             ]);
 
             $imageField = $request->input('image_field');

@@ -33,7 +33,7 @@ class FooterSettingsController extends Controller
             ],
             'social_links' => [
                 ['icon' => 'facebook', 'label' => 'Facebook', 'url' => '#'],
-                ['icon' => 'instagram', 'label' => 'Instagram', 'url' => '#'],
+                ['icon' => 'youtube', 'label' => 'YouTube', 'url' => '#'],
                 ['icon' => 'twitter', 'label' => 'Twitter', 'url' => '#'],
                 ['icon' => 'linkedin', 'label' => 'LinkedIn', 'url' => '#'],
             ],

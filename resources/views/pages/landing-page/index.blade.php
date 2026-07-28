@@ -24,7 +24,7 @@
                         <!-- Hero Section -->
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h6 class="card-title mb-0">Hero Section</h6>
+                                <h6 class="card-title mb-0">Hero Section (4 Auto-Changing Images)</h6>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
@@ -47,20 +47,22 @@
                                 </div>
 
                                 <div class="row">
+                                    @for($i = 1; $i <= 4; $i++)
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="hero_image_1" class="form-label">Hero Image 1</label>
-                                            <input type="file" class="form-control @error('hero_image_1') is-invalid @enderror" 
-                                                   id="hero_image_1" name="hero_image_1" accept="image/*">
-                                            @error('hero_image_1')
+                                            <label for="hero_image_{{ $i }}" class="form-label">Hero Image {{ $i }}</label>
+                                            <input type="file" class="form-control @error('hero_image_'.$i) is-invalid @enderror" 
+                                                   id="hero_image_{{ $i }}" name="hero_image_{{ $i }}" accept="image/*">
+                                            @error('hero_image_'.$i)
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
-                                            @if($homePage->hero_image_1)
+                                            @php $heroImage = 'hero_image_' . $i; @endphp
+                                            @if($homePage->$heroImage)
                                                 <div class="mt-2">
                                                     <small class="text-muted">Current image:</small>
                                                     <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
-                                                        <img src="{{ asset($homePage->hero_image_1) }}" alt="Hero 1" style="max-width: 200px; max-height: 150px; display: block;">
-                                                        <button type="button" class="btn btn-danger" onclick="deleteHeroImage('hero_image_1')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                                        <img src="{{ asset($homePage->$heroImage) }}" alt="Hero {{ $i }}" style="max-width: 200px; max-height: 150px; display: block;">
+                                                        <button type="button" class="btn btn-danger" onclick="deleteHeroImage('{{ $heroImage }}')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                                                             ×
                                                         </button>
                                                     </div>
@@ -68,27 +70,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="hero_image_2" class="form-label">Hero Image 2</label>
-                                            <input type="file" class="form-control @error('hero_image_2') is-invalid @enderror" 
-                                                   id="hero_image_2" name="hero_image_2" accept="image/*">
-                                            @error('hero_image_2')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                            @if($homePage->hero_image_2)
-                                                <div class="mt-2">
-                                                    <small class="text-muted">Current image:</small>
-                                                    <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
-                                                        <img src="{{ asset($homePage->hero_image_2) }}" alt="Hero 2" style="max-width: 200px; max-height: 150px; display: block;">
-                                                        <button type="button" class="btn btn-danger" onclick="deleteHeroImage('hero_image_2')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
+                                    @endfor
                                 </div>
                             </div>
                         </div>
@@ -215,17 +197,17 @@
 
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="instagram_url" class="form-label">
-                                                <i class="fab fa-instagram" style="color: #E4405F;"></i> Instagram URL
+                                            <label for="youtube_url" class="form-label">
+                                                <i class="fab fa-youtube text-danger"></i> YouTube URL
                                             </label>
-                                            <input type="url" class="form-control @error('instagram_url') is-invalid @enderror" 
-                                                   id="instagram_url" name="instagram_url" 
-                                                   value="{{ old('instagram_url', $footerSettings->instagram_url ?? '') }}" 
-                                                   placeholder="https://instagram.com/almukhtar">
-                                            @error('instagram_url')
+                                            <input type="url" class="form-control @error('youtube_url') is-invalid @enderror" 
+                                                   id="youtube_url" name="youtube_url" 
+                                                   value="{{ old('youtube_url', $footerSettings->youtube_url ?? '') }}" 
+                                                   placeholder="https://youtube.com/almukhtar">
+                                            @error('youtube_url')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
-                                            <small class="text-muted d-block mt-1">Enter your Instagram profile URL</small>
+                                            <small class="text-muted d-block mt-1">Enter your YouTube channel URL</small>
                                         </div>
                                     </div>
 
