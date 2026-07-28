@@ -71,9 +71,9 @@
                             </div>
 
                             <!-- Payment Method: Cash on Delivery only -->
-                            <input type="hidden" id="paymentMethodInput" name="paymentMethod" value="cod">
+                            <input type="hidden" id="paymentMethodInput" name="payment_method" value="cash_on_delivery">
 
-                            <button type="submit" class="btn btn-place-order">Proceed to Payment</button>
+                            <button type="submit" class="btn btn-place-order">Place Order (COD)</button>
                             <div id="formValidationError" class="alert alert-danger mt-3" style="display: none;"></div>
                         </form>
                     </div>
@@ -449,9 +449,9 @@
             // Update place order button text based on selected payment method
             const updatePlaceOrderText = () => {
                 const btn = document.querySelector('.btn-place-order');
-                const selected = document.getElementById('paymentMethodInput')?.value || 'cod';
+                const selected = document.getElementById('paymentMethodInput')?.value || 'cash_on_delivery';
                 if (btn) {
-                    btn.textContent = selected === 'cod' ? 'Place Order (COD)' : 'Proceed to Payment';
+                    btn.textContent = selected === 'cash_on_delivery' ? 'Place Order (COD)' : 'Proceed to Payment';
                 }
             };
 
@@ -474,7 +474,7 @@
                         return;
                     }
 
-                    const selectedPaymentMethod = document.getElementById('paymentMethodInput')?.value || 'cod';
+const selectedPaymentMethod = document.getElementById('paymentMethodInput')?.value || 'cash_on_delivery';
 
                     const orderData = {
                         customer_name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
