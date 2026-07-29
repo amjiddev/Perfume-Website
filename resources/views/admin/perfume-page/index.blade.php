@@ -20,7 +20,7 @@ Perfume Page Settings
 @method('PUT')
 <div class="card mb-4">
 <div class="card-header">
-<h6 class="card-title mb-0">Hero Section</h6>
+<h6 class="card-title mb-0">Hero Section (4 Auto-Changing Images)</h6>
 </div>
 <div class="card-body">
 <div class="mb-3">
@@ -31,20 +31,27 @@ Perfume Page Settings
 <label for="hero_subheading" class="form-label">Hero Subheading</label>
 <textarea class="form-control" id="hero_subheading" name="hero_subheading" rows="3">{{ old('hero_subheading', $perfumePage->hero_subheading) }}</textarea>
 </div>
+<div class="row">
+@for($i = 1; $i <= 4; $i++)
+<div class="col-md-6">
 <div class="mb-3">
-<label for="hero_image" class="form-label">Hero Background Image</label>
-<input type="file" class="form-control" id="hero_image" name="hero_image" accept="image/*">
-@if($perfumePage->hero_image)
+<label for="hero_image_{{ $i }}" class="form-label">Hero Image {{ $i }}</label>
+<input type="file" class="form-control" id="hero_image_{{ $i }}" name="hero_image_{{ $i }}" accept="image/*">
+@php $heroImage = 'hero_image_' . $i; @endphp
+@if($perfumePage->$heroImage)
 <div class="mt-2">
 <small class="text-muted">Current image:</small>
 <div style="position: relative; width: fit-content; margin-top: 0.5rem;">
-<img src="{{ asset($perfumePage->hero_image) }}" alt="Hero" style="max-width: 200px; display: block;">
-<button type="button" class="btn btn-danger" onclick="deletePageImage('perfume_page', 'hero_image')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+<img src="{{ asset($perfumePage->$heroImage) }}" alt="Hero {{ $i }}" style="max-width: 200px; max-height: 150px; display: block;">
+<button type="button" class="btn btn-danger" onclick="deletePageImage('perfume_page', '{{ $heroImage }}')" title="Remove image" style="position: absolute; top: -10px; right: -10px; padding: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
 ×
 </button>
 </div>
 </div>
 @endif
+</div>
+</div>
+@endfor
 </div>
 </div>
 </div>

@@ -14,7 +14,7 @@ class FooterSettings extends Model
         'social_links',
         'copyright_text',
         'facebook_url',
-        'instagram_url',
+        'youtube_url',
         'tiktok_url',
     ];
 

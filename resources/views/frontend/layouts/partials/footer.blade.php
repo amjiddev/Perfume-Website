@@ -56,7 +56,7 @@
                         @php
                             $socialLinks = [
                                 ['icon' => 'facebook', 'label' => 'Facebook', 'url' => $footerSettings->facebook_url ?? '#'],
-                                ['icon' => 'instagram', 'label' => 'Instagram', 'url' => $footerSettings->instagram_url ?? '#'],
+                                ['icon' => 'youtube', 'label' => 'YouTube', 'url' => $footerSettings->youtube_url ?? '#'],
                                 ['icon' => 'tiktok', 'label' => 'TikTok', 'url' => $footerSettings->tiktok_url ?? '#'],
                             ];
                         @endphp

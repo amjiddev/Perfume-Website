@@ -6,8 +6,9 @@
     <!-- Hero Section with Slider -->
     <section class="hero-section" id="heroSlider">
         <div class="hero-slider-container">
-            <div class="hero-slide active" id="heroSlide1" data-mobile="{{ asset($homePage->hero_image_1_mobile ?? $homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}" data-tablet="{{ asset($homePage->hero_image_1_tablet ?? $homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}" data-laptop="{{ asset($homePage->hero_image_1_laptop ?? $homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}" style="background-image: url('{{ asset($homePage->hero_image_1 ?? 'frontend/images/perfume1.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
-            <div class="hero-slide" id="heroSlide2" data-mobile="{{ asset($homePage->hero_image_2_mobile ?? $homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}" data-tablet="{{ asset($homePage->hero_image_2_tablet ?? $homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}" data-laptop="{{ asset($homePage->hero_image_2_laptop ?? $homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}" style="background-image: url('{{ asset($homePage->hero_image_2 ?? 'frontend/images/perfume2.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            @for($i = 1; $i <= 4; $i++)
+            <div class="hero-slide {{ $i === 1 ? 'active' : '' }}" id="heroSlide{{ $i }}" data-mobile="{{ asset($homePage->{'hero_image_' . $i . '_mobile'} ?? $homePage->{'hero_image_' . $i} ?? 'frontend/images/perfume' . $i . '.jpg') }}" data-tablet="{{ asset($homePage->{'hero_image_' . $i . '_tablet'} ?? $homePage->{'hero_image_' . $i} ?? 'frontend/images/perfume' . $i . '.jpg') }}" data-laptop="{{ asset($homePage->{'hero_image_' . $i . '_laptop'} ?? $homePage->{'hero_image_' . $i} ?? 'frontend/images/perfume' . $i . '.jpg') }}" style="background-image: url('{{ asset($homePage->{'hero_image_' . $i} ?? 'frontend/images/perfume' . $i . '.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            @endfor
         </div>
         
         <div class="hero-overlay"></div>
@@ -42,6 +43,8 @@
         <div class="hero-slider-indicators">
             <span class="indicator active" onclick="currentSlide(0)"></span>
             <span class="indicator" onclick="currentSlide(1)"></span>
+            <span class="indicator" onclick="currentSlide(2)"></span>
+            <span class="indicator" onclick="currentSlide(3)"></span>
         </div>
     </section>
 

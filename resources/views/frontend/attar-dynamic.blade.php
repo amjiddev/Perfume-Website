@@ -3,14 +3,37 @@
 @section('title', 'Premium Attar - Buy Alcohol-Free Perfume | Almukhtar Perfume')
 
 @section('content')
-    <!-- Hero Section -->
-    <section class="hero-section-centered" style="background-image: url('{{ asset($attarPage->hero_image ?? 'frontend/images/perfume7.jfif') }}');">
-        <div class="hero-overlay-light"></div>
-        <div class="hero-content-centered">
-            <div class="hero-text-centered">
-                <h1>{{ $attarPage->hero_heading }}</h1>
-                <p>{{ $attarPage->hero_subheading }}</p>
+    <!-- Hero Section with Carousel -->
+    <section class="hero-section" id="attarHeroSlider">
+        <div class="hero-slider-container">
+            @for($i = 1; $i <= 4; $i++)
+            <div class="hero-slide {{ $i === 1 ? 'active' : '' }}" id="attarHeroSlide{{ $i }}" style="background-image: url('{{ asset($attarPage->{'hero_image_' . $i} ?? 'frontend/images/perfume' . $i . '.jpg') }}?v={{ time() }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+            @endfor
+        </div>
+        
+        <div class="hero-overlay"></div>
+        
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>{{ $attarPage->hero_heading ?? 'Premium Attar' }}</h1>
+                <p>{{ $attarPage->hero_subheading ?? 'Alcohol-free, long-lasting natural fragrances for the discerning' }}</p>
             </div>
+        </div>
+
+        <!-- Slider Controls -->
+        <button class="slider-btn slider-btn-left" onclick="changeAttarSlide(-1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-btn slider-btn-right" onclick="changeAttarSlide(1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Slider Indicators -->
+        <div class="hero-slider-indicators">
+            <span class="indicator active" onclick="currentAttarSlide(0)"></span>
+            <span class="indicator" onclick="currentAttarSlide(1)"></span>
+            <span class="indicator" onclick="currentAttarSlide(2)"></span>
+            <span class="indicator" onclick="currentAttarSlide(3)"></span>
         </div>
     </section>
 
@@ -436,6 +459,88 @@
                 btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
                 btn.classList.remove('expanded');
             }
+        }
+
+        // ================================================
+        // ATTAR HERO SLIDER
+        // ================================================
+        let currentAttarSlideIndex = 0;
+        let attarAutoSlideTimer = null;
+        let attarSlides, attarIndicators, attarTotalSlides;
+
+        function initializeAttarSlider() {
+            const sliderId = 'attarHeroSlider';
+            attarSlides = document.querySelectorAll(`#${sliderId} .hero-slide`);
+            attarIndicators = document.querySelectorAll(`#${sliderId} .indicator`);
+            attarTotalSlides = attarSlides.length;
+
+            if (attarTotalSlides > 0) {
+                startAttarAutoSlide();
+                console.log('Attar slider initialized with', attarTotalSlides, 'slides');
+            }
+        }
+
+        function showAttarSlide(n) {
+            if (!attarSlides || attarSlides.length === 0) return;
+
+            if (n >= attarTotalSlides) {
+                currentAttarSlideIndex = 0;
+            } else if (n < 0) {
+                currentAttarSlideIndex = attarTotalSlides - 1;
+            } else {
+                currentAttarSlideIndex = n;
+            }
+
+            attarSlides.forEach(slide => slide.classList.remove('active'));
+            attarIndicators.forEach(indicator => indicator.classList.remove('active'));
+
+            if (attarSlides[currentAttarSlideIndex]) {
+                attarSlides[currentAttarSlideIndex].classList.add('active');
+            }
+            if (attarIndicators[currentAttarSlideIndex]) {
+                attarIndicators[currentAttarSlideIndex].classList.add('active');
+            }
+
+            console.log('Attar slide:', currentAttarSlideIndex);
+        }
+
+        function autoSlideAttar() {
+            if (attarTotalSlides > 0) {
+                currentAttarSlideIndex = (currentAttarSlideIndex + 1) % attarTotalSlides;
+                showAttarSlide(currentAttarSlideIndex);
+            }
+        }
+
+        function startAttarAutoSlide() {
+            if (attarAutoSlideTimer) clearInterval(attarAutoSlideTimer);
+            attarAutoSlideTimer = setInterval(autoSlideAttar, 5000);
+            console.log('Attar auto slide started');
+        }
+
+        function stopAttarAutoSlide() {
+            if (attarAutoSlideTimer) {
+                clearInterval(attarAutoSlideTimer);
+                attarAutoSlideTimer = null;
+            }
+        }
+
+        function changeAttarSlide(n) {
+            stopAttarAutoSlide();
+            showAttarSlide(currentAttarSlideIndex + n);
+            startAttarAutoSlide();
+        }
+
+        function currentAttarSlide(n) {
+            stopAttarAutoSlide();
+            showAttarSlide(n);
+            startAttarAutoSlide();
+        }
+
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAttarSlider);
+        } else {
+            initializeAttarSlider();
         }
     </script>
 @endsection
