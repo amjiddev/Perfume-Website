@@ -3,7 +3,6 @@
 use App\Http\Controllers\Apps\AboutPageController;
 use App\Http\Controllers\Apps\ContactPageController;
 use App\Http\Controllers\Apps\EmailSubscriptionController;
-use App\Http\Controllers\Apps\FooterSettingsController;
 use App\Http\Controllers\Apps\GuestGiftController;
 use App\Http\Controllers\Apps\HomePageController;
 use App\Http\Controllers\Apps\PermissionManagementController;
@@ -133,12 +132,6 @@ Route::middleware(['admin_or_redirect'])->group(function () {
 
     Route::controller(HomePageController::class)->prefix('admin/home-page')->as('admin.home-page.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::put('/', 'update')->name('update');
-    });
-
-    Route::controller(FooterSettingsController::class)->prefix('admin/footer-settings')->as('admin.footer-settings.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('edit', 'edit')->name('edit');
         Route::put('/', 'update')->name('update');
     });
 

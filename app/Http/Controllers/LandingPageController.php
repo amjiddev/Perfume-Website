@@ -50,13 +50,7 @@ class LandingPageController extends Controller
                 ]
             ]);
 
-            $footerSettings = \App\Models\FooterSettings::first() ?? \App\Models\FooterSettings::create([
-                'company_name' => 'Almukhtar Perfume',
-                'company_description' => 'Premium fragrances for the discerning taste.',
-                'copyright_text' => '© 2024 Almukhtar Perfume. All rights reserved.',
-            ]);
-
-            return view('pages.landing-page.index', compact('homePage', 'footerSettings'));
+            return view('pages.landing-page.index', compact('homePage'));
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             abort(403, 'You do not have permission to view this page.');
         } catch (\Throwable $e) {
@@ -158,23 +152,7 @@ class LandingPageController extends Controller
                 $homePage->update($validated);
             }
 
-            // Handle FooterSettings with social media URLs
-            $footerSettings = \App\Models\FooterSettings::first();
-            $footerData = [
-                'company_name' => $validated['company_name'],
-                'company_description' => $validated['company_description'],
-                'facebook_url' => $validated['facebook_url'] ?? null,
-                'youtube_url' => $validated['youtube_url'] ?? null,
-                'tiktok_url' => $validated['tiktok_url'] ?? null,
-            ];
-
-            if (!$footerSettings) {
-                \App\Models\FooterSettings::create($footerData);
-            } else {
-                $footerSettings->update($footerData);
-            }
-
-            return redirect()->back()->with('success', 'Home page and footer settings updated successfully!');
+            return redirect()->back()->with('success', 'Home page updated successfully!');
         } catch (\Throwable $e) {
             Log::error('LandingPage update error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
