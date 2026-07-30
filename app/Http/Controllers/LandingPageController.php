@@ -77,11 +77,9 @@ class LandingPageController extends Controller
                 'about_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'about_features' => 'nullable|array',
                 'about_features.*' => 'string|max:255',
-                'company_name' => 'required|string|max:255',
-                'company_description' => 'required|string',
-                'facebook_url' => 'nullable|url',
-                'youtube_url' => 'nullable|url',
-                'tiktok_url' => 'nullable|url',
+                'facebook_link' => 'nullable|url',
+                'youtube_link' => 'nullable|url',
+                'tiktok_link' => 'nullable|url',
             ]);
 
             // Handle HomePage

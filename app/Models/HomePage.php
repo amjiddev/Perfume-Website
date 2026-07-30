@@ -29,6 +29,9 @@ class HomePage extends Model
         'about_description',
         'about_image',
         'about_features',
+        'facebook_link',
+        'youtube_link',
+        'tiktok_link',
     ];
 
     protected $casts = [

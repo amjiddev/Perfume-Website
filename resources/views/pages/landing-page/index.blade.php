@@ -148,6 +148,58 @@
                             </div>
                         </div>
 
+                        <!-- Social Media Links Section -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Social Media Links</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info" role="alert">
+                                    <i class="bx bx-info-circle me-2"></i>
+                                    Add your social media links here. These will be displayed in the footer of your website.
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="facebook_link" class="form-label">
+                                        <i class="fab fa-facebook me-2" style="color: #1877F2;"></i>Facebook Link
+                                    </label>
+                                    <input type="url" class="form-control @error('facebook_link') is-invalid @enderror" 
+                                           id="facebook_link" name="facebook_link" 
+                                           value="{{ old('facebook_link', $homePage->facebook_link ?? '') }}" 
+                                           placeholder="e.g., https://www.facebook.com/yourbrand">
+                                    @error('facebook_link')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="youtube_link" class="form-label">
+                                        <i class="fab fa-youtube me-2" style="color: #FF0000;"></i>YouTube Link
+                                    </label>
+                                    <input type="url" class="form-control @error('youtube_link') is-invalid @enderror" 
+                                           id="youtube_link" name="youtube_link" 
+                                           value="{{ old('youtube_link', $homePage->youtube_link ?? '') }}" 
+                                           placeholder="e.g., https://www.youtube.com/yourbrand">
+                                    @error('youtube_link')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="tiktok_link" class="form-label">
+                                        <i class="fab fa-tiktok me-2" style="color: #000000;"></i>TikTok Link
+                                    </label>
+                                    <input type="url" class="form-control @error('tiktok_link') is-invalid @enderror" 
+                                           id="tiktok_link" name="tiktok_link" 
+                                           value="{{ old('tiktok_link', $homePage->tiktok_link ?? '') }}" 
+                                           placeholder="e.g., https://www.tiktok.com/@yourbrand">
+                                    @error('tiktok_link')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="d-flex gap-2 mb-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bx bx-save me-2"></i>Save Changes
